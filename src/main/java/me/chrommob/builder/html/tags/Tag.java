@@ -1,10 +1,13 @@
 package me.chrommob.builder.html.tags;
 
+import me.chrommob.builder.html.File;
+import me.chrommob.builder.html.FileProgress;
 import me.chrommob.builder.html.HtmlElement;
 import me.chrommob.builder.html.constants.GlobalAttributes;
 import me.chrommob.builder.html.constants.Internal;
 import me.chrommob.builder.html.events.EventTypes;
 import me.chrommob.builder.socket.Session;
+import org.apache.commons.lang3.function.TriConsumer;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -13,7 +16,7 @@ import static me.chrommob.builder.html.constants.GlobalAttributes.HREF;
 import static me.chrommob.builder.html.constants.GlobalAttributes.ID;
 
 public abstract class Tag {
-    private final Map<String, String> cssAttributes = new HashMap<>();
+    private final Map<String, Map<String, String>> cssAttributes = new HashMap<>();
     private final String elementName;
     private final boolean newLineStart;
     private final boolean newLineEnd;
@@ -21,6 +24,7 @@ public abstract class Tag {
     private final Map<GlobalAttributes, String> attributes = new HashMap<>();
     private String plainText;
     private final Map<EventTypes, BiConsumer<Session, HtmlElement>> events = new HashMap<>();
+    private final Map<EventTypes, TriConsumer<Session, FileProgress, File>> fileEvents = new HashMap<>();
 
     public Tag(String elementName, boolean newLineStart, boolean newLineEnd) {
         this.elementName = elementName;
@@ -86,8 +90,14 @@ public abstract class Tag {
         attributes.put(GlobalAttributes.CLASS, builder.toString());
     }
 
+    public Tag css(String selector, String property, String value) {
+        Map<String, String> css = cssAttributes.computeIfAbsent(selector, k -> new HashMap<>());
+        css.put(property, value);
+        return this;
+    }
+
     public Tag css(String attribute, String value) {
-        cssAttributes.put(attribute, value);
+        css("default", attribute, value);
         return this;
     }
 
@@ -118,22 +128,22 @@ public abstract class Tag {
         return attributes;
     }
 
-    public String build() {
+    public String build(boolean noLineBreak) {
         StringBuilder builder = new StringBuilder();
-        builder.append(renderFront());
+        builder.append(renderFront(noLineBreak));
         if (plainText != null) {
-            builder.append(plainText).append(getChildren().isEmpty() ? "" : System.lineSeparator());
+            builder.append(plainText).append(getChildren().isEmpty() ? "" : (noLineBreak ? "" : System.lineSeparator()));
         }
         for (Tag child : getChildren()) {
-            builder.append(child.build());
+            builder.append(child.build(noLineBreak));
         }
-        builder.append(renderPost());
+        builder.append(renderPost(noLineBreak));
         return builder.toString();
     }
 
-    public String renderFront() {
+    public String renderFront(boolean noLineBreak) {
         if (elementName == null) {
-            return Internal.HEADER + (newLineStart ? System.lineSeparator() : "");
+            return Internal.HEADER + (newLineStart ? noLineBreak ? "" : System.lineSeparator() : "");
         }
         StringBuilder builder = new StringBuilder();
         builder.append("<").append(elementName);
@@ -145,17 +155,17 @@ public abstract class Tag {
             builder.append("\"");
         }
         builder.append(">");
-        if (newLineStart) {
+        if (newLineStart && !noLineBreak) {
             builder.append(System.lineSeparator());
         }
         return builder.toString();
     }
 
-    public String renderPost() {
+    public String renderPost(boolean noLineBreak) {
         if (elementName == null) {
-            return newLineEnd ? System.lineSeparator() : "";
+            return newLineEnd ? noLineBreak ? "" : System.lineSeparator() : "";
         }
-        return "</" + elementName + ">" + (newLineEnd ? System.lineSeparator() : "");
+        return "</" + elementName + ">" + (newLineEnd ? noLineBreak ? "" : System.lineSeparator() : "");
     }
 
     public Tag plainText(String plainText) {
@@ -163,7 +173,7 @@ public abstract class Tag {
         return this;
     }
 
-    public Map<String, String> getCssAttributes() {
+    public Map<String, Map<String, String>> getCssAttributes() {
         return cssAttributes;
     }
 
@@ -182,8 +192,17 @@ public abstract class Tag {
         return this;
     }
 
+    public Tag fileEvent(EventTypes eventTypes, TriConsumer<Session, FileProgress, File> htmlElementConsumer) {
+        fileEvents.put(eventTypes, htmlElementConsumer);
+        return this;
+    }
+
     public Map<EventTypes, BiConsumer<Session, HtmlElement>> getEvents() {
         return events;
+    }
+
+    public Map<EventTypes, TriConsumer<Session, FileProgress, File>> getFileEvents() {
+        return fileEvents;
     }
 
     public String id() {

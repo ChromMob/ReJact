@@ -10,5 +10,5 @@ public enum GlobalAttributes {
     NAME,
     CONTENT,
     TYPE,
-    FOR
+    FOR,
 }

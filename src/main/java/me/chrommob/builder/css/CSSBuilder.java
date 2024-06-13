@@ -12,6 +12,11 @@ public class CSSBuilder {
         style.put(property, value);
     }
 
+    public void addClass(String className, Map<String, String> style) {
+        className = "." + className;
+        styles.put(className, style);
+    }
+
     public String build() {
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<String, Map<String, String>> entry : styles.entrySet()) {
