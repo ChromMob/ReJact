@@ -12,8 +12,13 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WebSocketImpl extends WebSocketServer {
+    private final Map<Session, Deque<String>> messageQueue = new HashMap<>();
     private final WebPageBuilder webPageBuilder;
     private final Gson gson = new Gson();
     public WebSocketImpl(int port, WebPageBuilder webPageBuilder) {
@@ -35,6 +40,7 @@ public class WebSocketImpl extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
+        System.out.println(conn.getRemoteSocketAddress() + " In: " + message);
         String[] cookie = null;
         if (message.startsWith("session")) {
             String temp = message.substring(8);
@@ -78,6 +84,10 @@ public class WebSocketImpl extends WebSocketServer {
         if (message.startsWith("file")) {
             message = message.substring(5);
             File file = gson.fromJson(message, File.class);
+            if (file.eventType().equals("getFileInfo")) {
+                session.answerFileInfo(file);
+                return;
+            }
             session.getFileMap().put(new Session.FileMessage(file.id(), file.eventType()), file);
         }
     }

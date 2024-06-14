@@ -12,10 +12,7 @@ import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -40,23 +37,6 @@ public class WebPageBuilder {
     private final Map<EventTypes, List<Tag>> fileEventMap = new HashMap<>();
 
     public WebPageBuilder(String ip, int webPort, int serverPort, int clientPort) {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                for (Session session : sessions.values()) {
-                    if (session.getCloseTime() != 0) {
-                        if (System.currentTimeMillis() - session.getCloseTime() > 10000 && session.getWebSocket().isClosed()) {
-                            webSockets.remove(session.getInternalCookie());
-                            sessions.remove(session.getWebSocket());
-                        }
-                    }
-                }
-            }
-        }).start();
         this.ip = ip;
         this.clientPort = clientPort;
 
@@ -80,6 +60,43 @@ public class WebPageBuilder {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                for (Session session : sessions.values()) {
+                    if (session.getCloseTime() != 0) {
+                        if (System.currentTimeMillis() - session.getCloseTime() > 10000 && session.getWebSocket().isClosed()) {
+                            webSockets.remove(session.getInternalCookie());
+                            sessions.remove(session.getWebSocket());
+                        }
+                    }
+                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+                String line = null;
+                try {
+                    line = reader.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (line != null) {
+                    if (line.equals("exit")) {
+                        webSocket.getConnections().forEach(ws -> ws.close());
+                        try {
+                            webSocket.stop();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        app.stop();
+                        System.exit(0);
+                    }
+                }
+            }
+        }).start();
     }
 
     private static SSLContext getContext() {

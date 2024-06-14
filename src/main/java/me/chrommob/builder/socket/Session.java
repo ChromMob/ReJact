@@ -9,14 +9,12 @@ import me.chrommob.builder.html.events.EventTypes;
 import me.chrommob.builder.html.tags.Tag;
 import org.java_websocket.WebSocket;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Session {
+    private final List<String> messageQueue = new ArrayList<>();
     private final Map<String, String> cookies = new HashMap<>();
     private final Map<EventTypes, List<Tag>> eventMap;
     private final Map<EventTypes, List<Tag>> fileEventMap;
@@ -28,6 +26,7 @@ public class Session {
     private final Map<String, Consumer<HtmlElement>> firstChildMap = new HashMap<>();
     private final Map<String, Consumer<HtmlElement>> firstChildMapExists = new HashMap<>();
     private final Map<String, BiConsumer<FileProgress, File>> fileMapCallback = new HashMap<>();
+    private final Map<String, Consumer<File>> fileInfoMap = new HashMap<>();
     private WebSocket webSocket;
     private final String internalCookie;
     private long closeTime;
@@ -77,8 +76,14 @@ public class Session {
 
     private void sendMessage(String message) {
         if (webSocket == null || !webSocket.isOpen()) {
+            messageQueue.add(message);
             return;
         }
+        for (String s : messageQueue) {
+            webSocket.send(s);
+        }
+        messageQueue.clear();
+        System.out.println(webSocket.getRemoteSocketAddress() + " Out: " + message);
         webSocket.send(message);
     }
 
@@ -107,6 +112,11 @@ public class Session {
         sendMessage(js);
     }
 
+    public void clearValue(String id) {
+        String js = "document.getElementById('" + id + "').value = null;";
+        sendMessage(js);
+    }
+
     public void setInnerHtml(HtmlElement htmlElement, String innerHtml) {
         String id = htmlElement.id();
         String js = "document.getElementById('" + id + "').innerHTML = '" + innerHtml + "';";
@@ -128,52 +138,91 @@ public class Session {
         fileMapCallback.put(id, consumer);
         String js =
                 "async function getFile() {\n" +
+                        "    var message_type = \"file\";\n" +
+                        "    var element = document.getElementById('" + id + "');\n" +
+                        "    var idBytes = new TextEncoder().encode(element.id);\n" +
+                        "    var messageTypeBytes = new TextEncoder().encode(\"getFile\");\n" +
+                        "    var arrayBuffer = await element.files[0].arrayBuffer();\n" +
+                        "    var bytes = new Uint8Array(arrayBuffer);\n" +
+                        "    var parts = Math.ceil(bytes.length / 102400);\n" +
+                        "    var json = {\n" +
+                        "        \"exists\": true,\n" +
+                        "        \"parts\": parts,\n" +
+                        "        \"id\": element.id,\n" +
+                        "        \"eventType\": \"getFile\",\n" +
+                        "        \"lastModified\": element.files[0].lastModified,\n" +
+                        "        \"name\": element.files[0].name,\n" +
+                        "        \"size\": element.files[0].size,\n" +
+                        "        \"type\": element.files[0].type\n" +
+                        "    };\n" +
+                        "    sendMessage(message_type + \" \" + JSON.stringify(json));\n" +
+                        "\n" +
+                        "    var part = 0;\n" +
+                        "    function sendNextPart() {\n" +
+                        "        if (part < parts) {\n" +
+                        "            var start = part * 102400;\n" +
+                        "            var end = Math.min((part + 1) * 102400, bytes.length);\n" +
+                        "            var bytesPart = bytes.slice(start, end);\n" +
+                        "            if (part == 0) {\n" +
+                        "                console.log(bytesPart);\n" +
+                        "            }\n" +
+                        "            var messageTypeBytesPart = new TextEncoder().encode(\"getFile\");\n" +
+                        "            const newBytes = new Uint8Array(8 + idBytes.length + 4 + messageTypeBytes.length + bytesPart.length);\n" +
+                        "            const view = new DataView(newBytes.buffer);\n" +
+                        "            var index = 0;\n" +
+                        "            view.setUint32(index, part + 1);\n" +
+                        "            index += 4;\n" +
+                        "            view.setUint32(index, idBytes.length, false);\n" +
+                        "            index += 4;\n" +
+                        "            newBytes.set(idBytes, index);\n" +
+                        "            index += idBytes.length;\n" +
+                        "            view.setUint32(index, messageTypeBytes.length, false);\n" +
+                        "            index += 4;\n" +
+                        "            newBytes.set(messageTypeBytes, index);\n" +
+                        "            index += messageTypeBytes.length;\n" +
+                        "            newBytes.set(bytesPart, index);\n" +
+                        "            sendMessage(newBytes);\n" +
+                        "            part++;\n" +
+                        "            setTimeout(sendNextPart, 100)" +
+                        "        }\n" +
+                        "    }\n" +
+                        "    \n" +
+                        "    sendNextPart();\n" +
+                        "}\n" +
+                        "\n" +
+                        "getFile();";
+        sendMessage(js);
+    }
+
+    public void getFileInfo(String file, Consumer<File> consumer) {
+        fileInfoMap.put(file, consumer);
+        String js =
                 "    var message_type = \"file\";\n" +
-                "    var element = document.getElementById('" + id + "');\n" +
-                "    var idBytes = new TextEncoder().encode(element.id);\n" +
-                "    var messageTypeBytes = new TextEncoder().encode(\"getFile\");\n" +
-                "    var bytes = await element.files[0].bytes();\n" +
-                "    var parts = Math.ceil(bytes.length / 1048576);\n" +
-                "    var json = {\n" +
-                "      \"parts\": parts,\n" +
-                "      \"id\": element.id,\n" +
-                "      \"eventType\": \"getFile\",\n" +
-                "      \"lastModified\": element.files[0].lastModified,\n" +
-                "      \"name\": element.files[0].name,\n" +
-                "      \"size\": element.files[0].size,\n" +
-                "      \"type\": element.files[0].type\n" +
-                "    };\n" +
-                "    sendMessage(message_type + \" \" + JSON.stringify(json));\n" +
-                "    for (var part = 0; part < parts; part++) {\n" +
-                "      var start = part * 1048576;\n" +
-                "      var end = Math.min((part + 1) * 1048576, bytes.length);\n" +
-                "      var bytesPart = bytes.slice(start, end);\n" +
-                "      var messageTypeBytesPart = new TextEncoder().encode(\"getFile\");\n" +
-                "      const newBytes = new Uint8Array(8 + idBytes.length + 4 + messageTypeBytes.length + bytesPart.length);\n" +
-                "      const view = new DataView(newBytes.buffer);\n" +
-                "      var index = 0;\n" +
-                "      view.setUint32(index, part+1);\n" +
-                "      index += 4;\n" +
-                "      view.setUint32(index, idBytes.length, false);\n" +
-                "      index += 4;\n" +
-                "      newBytes.set(idBytes, index);\n" +
-                "      index += idBytes.length;\n" +
-                "      view.setUint32(index, messageTypeBytes.length, false);\n" +
-                "      index += 4;\n" +
-                "      newBytes.set(messageTypeBytes, index);\n" +
-                "      index += messageTypeBytes.length;\n" +
-                "      newBytes.set(bytesPart, index);\n" +
-                "      ws.send(newBytes);\n" +
-                "      await new Promise(resolve => setTimeout(resolve, 1000));\n" +
-                "    }\n" +
-                "}\n" +
-                "getFile();\n";
+                "    var element = document.getElementById('" + file + "');\n" +
+                "    var exists = element.files != null && element.files.length > 0 && element.files[0] != undefined;\n" +
+                "    if (exists) {\n" +
+                "        var bytes = new Uint8Array(element.files[0].arrayBuffer());\n" +
+                "        var parts = Math.ceil(bytes.length / 102400);\n" +
+                "        var json = {\n" +
+                "            \"exists\": true,\n" +
+                "            \"parts\": parts,\n" +
+                "            \"id\": element.id,\n" +
+                "            \"eventType\": \"getFileInfo\",\n" +
+                "            \"lastModified\": element.files[0].lastModified,\n" +
+                "            \"name\": element.files[0].name,\n" +
+                "            \"size\": element.files[0].size,\n" +
+                "            \"type\": element.files[0].type\n" +
+                "        };\n" +
+                "        sendMessage(message_type + \" \" + JSON.stringify(json));\n" +
+                "    } else {\n" +
+                "        sendMessage(message_type + \" \" + JSON.stringify({exists: false, id: element.id, eventType: \"getFileInfo\"}));\n" +
+                "    }\n";
         sendMessage(js);
     }
 
     public void hasElement(String username, Consumer<HtmlElement> consumer) {
         hasElementMap.put(username, consumer);
-        String js = "var element = document.getElementById('" + username + "'); ws.send(\"fetch \" + JSON.stringify({sourceId: \"" + username + "\", id: \"" + username + "\", type: \"hasEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: element != undefined}));";
+        String js = "var element = document.getElementById('" + username + "'); sendMessage(\"fetch \" + JSON.stringify({sourceId: \"" + username + "\", id: \"" + username + "\", type: \"hasEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: element != undefined}));";
         sendMessage(js);
     }
 
@@ -186,7 +235,7 @@ public class Session {
     public void hasLastChild(HtmlElement htmlElement, Consumer<HtmlElement> consumer) {
         lastChildMapExists.put(htmlElement.sourceId(), consumer);
         String id = htmlElement.id();
-        String js = "var element = document.getElementById(\"" + id + "\"); ws.send(\"fetch \" + JSON.stringify({sourceId: \"" + id + "\", id: \"" + id + "\", type: \"hasLastEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: element.lastChild != undefined}));";
+        String js = "var element = document.getElementById(\"" + id + "\"); sendMessage(\"fetch \" + JSON.stringify({sourceId: \"" + id + "\", id: \"" + id + "\", type: \"hasLastEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: element.lastChild != undefined}));";
         sendMessage(js);
     }
 
@@ -199,7 +248,7 @@ public class Session {
     public void hasFirstChild(HtmlElement htmlElement, Consumer<HtmlElement> consumer) {
         firstChildMapExists.put(htmlElement.id(), consumer);
         String id = htmlElement.id();
-        String js = "var element = document.getElementById(\"" + id + "\"); ws.send(\"fetch \" + JSON.stringify({sourceId: \"" + id + "\", id: \"" + id + "\", type: \"hasFirstEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: element.firstChild != undefined}));";
+        String js = "var element = document.getElementById(\"" + id + "\"); sendMessage(\"fetch \" + JSON.stringify({sourceId: \"" + id + "\", id: \"" + id + "\", type: \"hasFirstEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: element.firstChild != undefined}));";
         sendMessage(js);
     }
 
@@ -235,6 +284,14 @@ public class Session {
         if (fileProgress.isComplete()) {
             fileMap.remove(file.id());
         }
+    }
+
+    public void answerFileInfo(File file) {
+        Consumer<File> consumer = fileInfoMap.get(file.id());
+        if (consumer != null) {
+            consumer.accept(file);
+        }
+        fileInfoMap.remove(file.id());
     }
 
     public void answerHasElement(HtmlElement htmlElement) {

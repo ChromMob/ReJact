@@ -26,9 +26,12 @@ public class EventBuilders {
     public static final EventBuilder perElement = new EventBuilder() {
         @Override
         public String build(EventTypes eventTypes, Object extraData) {
+            boolean preventDefault = (boolean) extraData;
             return "for (var i = 0; i < " + eventTypes.name().toLowerCase() + ".length; i++) {\n" +
                     "  document.getElementById(" + eventTypes.name().toLowerCase() + "[i]).addEventListener('" + eventTypes.name().toLowerCase() + "', function (event) {\n" +
-                    "    event.preventDefault();\n" +
+                    "    if (" + preventDefault + ") {\n" +
+                    "      event.preventDefault();\n" +
+                    "    }\n" +
                     "    var message_type = \"event\";\n" +
                     "    var json = {\n" +
                     "      \"sourceId\": this.id,\n" +
@@ -65,9 +68,12 @@ public class EventBuilders {
     public static final EventBuilder global = new EventBuilder() {
         @Override
         public String build(EventTypes eventTypes, Object extraData) {
+            boolean preventDefault = (boolean) extraData;
             return  "var message_type = \"event\";\n" +
                     "window.addEventListener('" + eventTypes.name().toLowerCase() + "', function (event) {\n" +
-                    "    event.preventDefault();\n" +
+                    "    if (" + preventDefault + ") {\n" +
+                    "      event.preventDefault();\n" +
+                    "    }\n" +
                     "    var message_type = \"event\";\n" +
                     "    for (var i = 0; i < " + eventTypes.name().toLowerCase() + ".length; i++) {\n" +
                     "    var json = {\n" +

@@ -4,26 +4,23 @@ import me.chrommob.builder.Page;
 import me.chrommob.builder.WebPageBuilder;
 import me.chrommob.builder.html.constants.GlobalAttributes;
 import me.chrommob.builder.html.constants.HeadingLevel;
+import me.chrommob.builder.html.constants.Internal;
 import me.chrommob.builder.html.events.EventTypes;
 import me.chrommob.builder.html.tags.*;
 import me.chrommob.builder.socket.Session;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static me.chrommob.builder.html.constants.GlobalAttributes.*;
 
 public class Main {
     static WebPageBuilder builder;
-    public static final List<String> messages = new ArrayList<>();
+    public static final List<Message> messages = new ArrayList<>();
     public static void main(String[] args) {
         new Main().buildPage();
     }
+
+    record Message(String username, Tag message) {}
 
     public void buildPage() {
         int port = 9080;
@@ -172,13 +169,9 @@ class Chat extends Tag {
                         .css(" *", "max-width", "100%").css(" *", "margin", "2px")
                         .event(EventTypes.BEFORELOAD, (session, htmlElement) -> {
                             for (int i = 0; i < Main.messages.size(); i++) {
-                                String message = Main.messages.get(i);
+                                Main.Message message = Main.messages.get(i);
+                                Tag messageTag = message.message().clone();
                                 boolean isLastMessage = i == Main.messages.size() - 1;
-                                String username = message.substring(0, message.indexOf(": "));
-                                String messageText = message.substring(message.indexOf(": ") + 2);
-                                Tag messageTag = new DivTag()
-                                        .addChild(new BoldTag().plainText(username + ": "))
-                                        .addChild(new ParagraphTag().plainText(messageText));
                                 if (isLastMessage) {
                                     messageTag.addAttribute(GlobalAttributes.ID, "lastMessage");
                                 }
@@ -215,47 +208,55 @@ class Chat extends Tag {
         if (webPageBuilder.getActiveSessions() == null) {
             return;
         }
-        sourceSession.getHtmlElement("message", message -> {
-            sourceSession.getFile("file", (fileProgress, callBackFile) -> {
-                sourceSession.setInnerHtml("progress", fileProgress.getPercentage());
-                sourceSession.show("progressName");
-                sourceSession.show("progress");
-                if (!fileProgress.isComplete()) {
-                    return;
-                }
-                sourceSession.hide("progressName");
-                sourceSession.hide("progress");
-                File file = new File(callBackFile.name());
-                try (FileOutputStream writer = new FileOutputStream(file)) {
-                    writer.write(callBackFile.data());
-                    writer.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                sourceSession.setValue("message", "");
-                String username = sourceSession.getCookie("username");
-                if (username == null) {
-                    return;
-                }
-                Main.messages.add(username + ": " + message.value());
-                for (Session session : webPageBuilder.getActiveSessions()) {
-                    session.getHtmlElement("messages", messages -> {
-                        session.hasLastChild(messages, exists -> {
-                            if (exists.value().equals("true")) {
-                                session.getLastChild(messages, lastMessageElement -> {
-                                    session.removeAttribute(lastMessageElement, GlobalAttributes.ID);
-                                });
-                            }
-                            Tag messageTag = new DivTag()
-                                    .addChild(new BoldTag().plainText(username + ": "))
-                                    .addChild(new ParagraphTag().plainText(message.value()));
-                            session.addChild(messages, messageTag.addAttribute(ID, "lastMessage"));
-                            session.scrollTo("lastMessage");
-                        });
+        sourceSession.getFileInfo("file", fileData -> {
+            if (fileData.exists() && Internal.isImage(fileData.type()) && !fileData.isBiggerThan(10, Internal.SIZE_UNITS.MB)) {
+                sourceSession.getFile("file", (fileProgress, callBackFile) -> {
+                    sourceSession.setInnerHtml("progress", fileProgress.getPercentage());
+                    sourceSession.show("progressName");
+                    sourceSession.show("progress");
+                    if (!fileProgress.isComplete()) {
+                        return;
+                    }
+                    sourceSession.hide("progressName");
+                    sourceSession.hide("progress");
+                    postMessage(sourceSession, callBackFile.data());
+                    sourceSession.clearValue("file");
+                });
+                return;
+            }
+            postMessage(sourceSession, null);
+        });
+    }
 
+    private void postMessage(Session sourceSession, byte[] imageData) {
+        sourceSession.getHtmlElement("message", message -> {
+            String messageValue = message.value();
+            sourceSession.setValue("message", "");
+            String username = sourceSession.getCookie("username");
+            if (username == null) {
+                return;
+            }
+            Tag messageTag = new DivTag()
+                    .addChild(new BoldTag().plainText(username + ": "))
+                    .addChild(new ParagraphTag().plainText(messageValue));
+            if (imageData != null) {
+                messageTag.addChild(new ImageTag().addAttribute(SRC, "data:image/png;base64," + Base64.getEncoder().encodeToString(imageData)));
+            }
+            Main.messages.add(new Main.Message(username, messageTag));
+            Tag finalMessageTag = messageTag.clone();
+            for (Session session : webPageBuilder.getActiveSessions()) {
+                session.getHtmlElement("messages", messages -> {
+                    session.hasLastChild(messages, exists -> {
+                        if (exists.value().equals("true")) {
+                            session.getLastChild(messages, lastMessageElement -> {
+                                session.removeAttribute(lastMessageElement, GlobalAttributes.ID);
+                            });
+                        }
+                        session.addChild(messages, finalMessageTag.addAttribute(ID, "lastMessage"));
+                        session.scrollTo("lastMessage");
                     });
-                }
-            });
+                });
+            }
         });
     }
 }

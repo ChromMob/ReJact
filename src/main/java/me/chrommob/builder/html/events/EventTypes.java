@@ -3,11 +3,11 @@ package me.chrommob.builder.html.events;
 public enum EventTypes {
 
     BEFORELOAD(EventBuilders.justRun, null),
-    BEFOREUNLOAD(EventBuilders.global, null),
-    MOUSEOVER(EventBuilders.perElement, null),
-    MOUSEOUT(EventBuilders.perElement, null),
-    CLICK(EventBuilders.perElement, null),
-    LOAD(EventBuilders.global, null),
+    BEFOREUNLOAD(EventBuilders.global, false),
+    MOUSEOVER(EventBuilders.perElement, false),
+    MOUSEOUT(EventBuilders.perElement, false),
+    CLICK(EventBuilders.perElement, true),
+    LOAD(EventBuilders.global, false),
     KEYDOWN(EventBuilders.perElementWithEventValue, "key"),
     TENSECONDTIMER(EventBuilders.timer, "10000"),
     SECONDTIMER(EventBuilders.timer, "1000"),

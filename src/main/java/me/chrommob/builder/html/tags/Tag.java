@@ -213,4 +213,39 @@ public abstract class Tag {
         }
         return id;
     }
+
+    public Tag clone() {
+        Class<? extends Tag> clazz = this.getClass();
+        Tag tag = null;
+        try {
+            tag = clazz.getConstructor().newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        tag.setAttributes(getAttributes());
+        tag.setCssAttributes(getCssAttributes());
+        for (Tag child : getChildren()) {
+            tag.addChild(child.clone());
+        }
+        tag.setEvents(getEvents());
+        tag.setFileEvents(getFileEvents());
+        tag.plainText(plainText);
+        return tag;
+    }
+
+    private void setCssAttributes(Map<String, Map<String, String>> cssAttributes) {
+        cssAttributes.forEach(this.cssAttributes::put);
+    }
+
+    private void setAttributes(Map<GlobalAttributes, String> attributes) {
+        attributes.forEach(this.attributes::put);
+    }
+
+    private void setEvents(Map<EventTypes, BiConsumer<Session, HtmlElement>> events) {
+        events.forEach(this.events::put);
+    }
+
+    private void setFileEvents(Map<EventTypes, TriConsumer<Session, FileProgress, File>> fileEvents) {
+        fileEvents.forEach(this.fileEvents::put);
+    }
 }
