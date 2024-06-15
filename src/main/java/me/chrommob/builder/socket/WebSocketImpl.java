@@ -40,7 +40,6 @@ public class WebSocketImpl extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        System.out.println(conn.getRemoteSocketAddress() + " In: " + message);
         String[] cookie = null;
         if (message.startsWith("session")) {
             String temp = message.substring(8);

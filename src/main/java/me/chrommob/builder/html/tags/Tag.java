@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
 import static me.chrommob.builder.html.constants.GlobalAttributes.HREF;
 import static me.chrommob.builder.html.constants.GlobalAttributes.ID;
 
-public abstract class Tag {
+public class Tag {
     private final Map<String, Map<String, String>> cssAttributes = new HashMap<>();
     private final String elementName;
     private final boolean newLineStart;
