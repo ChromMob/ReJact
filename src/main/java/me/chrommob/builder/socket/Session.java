@@ -83,7 +83,6 @@ public class Session {
             webSocket.send(s);
         }
         messageQueue.clear();
-        System.out.println(webSocket.getRemoteSocketAddress() + " Out: " + message);
         webSocket.send(message);
     }
 

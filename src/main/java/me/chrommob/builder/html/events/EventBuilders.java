@@ -150,7 +150,7 @@ public class EventBuilders {
         }
     };
 
-    abstract static class EventBuilder {
+    public abstract static class EventBuilder {
         public abstract String build(EventTypes eventTypes, Object extraData);
     }
 }
