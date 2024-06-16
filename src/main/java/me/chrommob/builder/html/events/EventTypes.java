@@ -23,4 +23,8 @@ public enum EventTypes {
     public String build() {
         return eventBuilders.build(this, extraData);
     }
+
+    public String buildForName(String id) {
+        return eventBuilders.buildForName(this, id, extraData);
+    }
 }

@@ -7,6 +7,7 @@ import me.chrommob.builder.html.events.EventTypes;
 import me.chrommob.builder.html.tags.*;
 import me.chrommob.kasper.components.AdminComponent;
 import me.chrommob.kasper.components.LoginComponent;
+import me.chrommob.kasper.components.products.ProductComponent;
 
 import java.io.*;
 import java.security.MessageDigest;
@@ -49,6 +50,7 @@ public class KasperPage {
                         .addChild(new MetaTag().addAttribute(NAME, "viewport").addAttribute(CONTENT, "width=device-width, initial-scale=1"))
                 )
                 .addChild(new BodyTag()
+                        .addChild(new ProductComponent(dataFolder))
                 )
         );
 
@@ -59,7 +61,7 @@ public class KasperPage {
                         .addChild(new MetaTag().addAttribute(NAME, "viewport").addAttribute(CONTENT, "width=device-width, initial-scale=1"))
                 )
                 .addChild(new BodyTag()
-                        .addChild(new AdminComponent(user -> addUser(user.username(), user.password()), user -> removeUser(user.username())))
+                        .addChild(new AdminComponent(user -> addUser(user.username(), user.password()), user -> removeUser(user.username()), usernamePasswordHashMap.keySet()))
                 )
         );
 

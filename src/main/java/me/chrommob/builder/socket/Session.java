@@ -1,19 +1,23 @@
 package me.chrommob.builder.socket;
 
+import me.chrommob.builder.Page;
 import me.chrommob.builder.html.File;
 import me.chrommob.builder.html.FileProgress;
 import me.chrommob.builder.html.HtmlElement;
 import me.chrommob.builder.html.constants.GlobalAttributes;
 import me.chrommob.builder.html.constants.Internal;
 import me.chrommob.builder.html.events.EventTypes;
-import me.chrommob.builder.html.tags.Tag;
+import me.chrommob.builder.html.tags.*;
+import org.apache.commons.lang3.function.TriConsumer;
 import org.java_websocket.WebSocket;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Session {
+    private final Page page;
     private final List<String> messageQueue = new ArrayList<>();
     private final Map<String, String> cookies = new HashMap<>();
     private final Map<EventTypes, List<Tag>> eventMap;
@@ -31,7 +35,8 @@ public class Session {
     private final String internalCookie;
     private long closeTime;
 
-    public Session(Map<EventTypes, List<Tag>> eventMap, Map<EventTypes, List<Tag>> fileEventMap, WebSocket webSocket) {
+    public Session(Page page, Map<EventTypes, List<Tag>> eventMap, Map<EventTypes, List<Tag>> fileEventMap, WebSocket webSocket) {
+        this.page = page;
         this.eventMap = eventMap;
         this.fileEventMap = fileEventMap;
         this.webSocket = webSocket;
@@ -375,15 +380,83 @@ public class Session {
 
     public void addChild(HtmlElement messages, Tag tag) {
         String id = messages.id();
+        String jsEvents = handleRuntimeEventAdd(tag);
         String js = "document.getElementById('" + id + "').innerHTML += '" + tag.build(true) + "';";
-        sendMessage(js);
+        sendMessage(js + "\n" + jsEvents);
     }
 
     public void addFirstChild(HtmlElement messages, Tag tag) {
         String id = messages.id();
-        //Set the innnerHTML to the tag and append the element.innerHTML to it
+        String jsEvents = handleRuntimeEventAdd(tag);
         String js = "var element = document.getElementById('" + id + "'); var innerHTML = element.innerHTML; element.innerHTML = '" + tag.build(true) + "'; element.innerHTML += innerHTML;";
-        sendMessage(js);
+        sendMessage(js + "\n" + jsEvents);
+    }
+
+    @NotNull
+    private static Map<Tag, Set<EventTypes>> getTagSetMap(Tag tag) {
+        Map<Tag, Set<EventTypes>> neededEventTypes = new HashMap<>();
+        for (Map.Entry<Tag, Map<EventTypes, BiConsumer<Session, HtmlElement>>> entry : tag.getAllEvents().entrySet()) {
+            Tag tag1 = entry.getKey();
+            neededEventTypes.compute(tag1, (k, v) -> {
+                if (v == null) {
+                    return new HashSet<>(entry.getValue().keySet());
+                } else {
+                    v.addAll(entry.getValue().keySet());
+                    return v;
+                }
+            });
+        }
+        for (Map.Entry<Tag, Map<EventTypes, TriConsumer<Session, FileProgress, File>>> entry : tag.getAllFileEvents().entrySet()) {
+            Tag tag1 = entry.getKey();
+            neededEventTypes.compute(tag1, (k, v) -> {
+                if (v == null) {
+                    return new HashSet<>(entry.getValue().keySet());
+                } else {
+                    v.addAll(entry.getValue().keySet());
+                    return v;
+                }
+            });
+        }
+        return neededEventTypes;
+    }
+
+    private String handleRuntimeEventAdd(Tag tag) {
+        StringBuilder jsEvents = new StringBuilder();
+        jsEvents.append("setTimeout(function() {\n");
+        Map<Tag, Set<EventTypes>> neededEventTypes = getTagSetMap(tag);
+        for (Map.Entry<Tag, Set<EventTypes>> entry : neededEventTypes.entrySet()) {
+            Tag tag1 = entry.getKey();
+            Set<EventTypes> eventTypes = entry.getValue();
+            for (EventTypes eventTypes1 : eventTypes) {
+                eventMap.compute(eventTypes1, (k, v) -> {
+                    if (v == null) {
+                        v = new ArrayList<>();
+                    }
+                    v.add(tag1);
+                    return v;
+                });
+                jsEvents.append(eventTypes1.buildForName("\"" + tag1.id() + "\"")).append("\n");
+            }
+        }
+        jsEvents.append("}, 500);\n");
+        return jsEvents.toString();
+    }
+
+    private void handleRuntimeEventRemove(Tag tag) {
+        Map<Tag, Set<EventTypes>> neededEventTypes = getTagSetMap(tag);
+        for (Map.Entry<Tag, Set<EventTypes>> entry : neededEventTypes.entrySet()) {
+            Tag tag1 = entry.getKey();
+            Set<EventTypes> eventTypes = entry.getValue();
+            for (EventTypes eventTypes1 : eventTypes) {
+                eventMap.compute(eventTypes1, (k, v) -> {
+                    if (v == null) {
+                        v = new ArrayList<>();
+                    }
+                    v.remove(tag1);
+                    return v;
+                });
+            }
+        }
     }
 
     public void removeAttribute(HtmlElement lastMessageElement, GlobalAttributes id) {

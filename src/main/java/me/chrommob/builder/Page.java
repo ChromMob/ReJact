@@ -12,10 +12,7 @@ import me.chrommob.builder.socket.Session;
 import org.apache.commons.lang3.function.TriConsumer;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -136,7 +133,17 @@ public class Page {
         return path;
     }
 
-    class ScriptTag extends Tag {
+    public Set<Tag> getChildByClass(Class<? extends Tag> clazz) {
+        Set<Tag> set = new HashSet<>();
+        root.getAllChildren().forEach(tag -> {
+            if (clazz.isInstance(tag)) {
+                set.add(tag);
+            }
+        });
+        return set;
+    }
+
+    public class ScriptTag extends Tag {
         public ScriptTag(String append) {
             super("script", true, true);
             String script = FileUtils.readFileToString(new File("script.js"));

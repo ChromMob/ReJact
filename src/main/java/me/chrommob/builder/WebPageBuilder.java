@@ -35,6 +35,7 @@ public class WebPageBuilder {
     private final Map<WebSocket, Session> sessions = new ConcurrentHashMap<>();
     private final Map<EventTypes, List<Tag>> eventMap = new HashMap<>();
     private final Map<EventTypes, List<Tag>> fileEventMap = new HashMap<>();
+    private final Map<String, Page> pages = new HashMap<>();
 
     public WebPageBuilder(String ip, int webPort, int serverPort, int clientPort) {
         this.ip = ip;
@@ -169,28 +170,48 @@ public class WebPageBuilder {
         return bytesArray;
     }
 
-
-
     public Page newPage(String path) {
         Page page = new Page(path, ip, clientPort, eventMap, fileEventMap);
         app.get(path, ctx -> ctx.html(page.getHtmlString()));
+        if (!path.endsWith("/")) {
+            path += "/";
+        }
+        pages.put(path, page);
         return page;
     }
 
-    public Session getSession(WebSocket conn, String[] cookie) {
+    public Session getSession(String href, WebSocket conn, String[] cookie) {
         if (cookie != null) {
+            String correctCookie = null;
+            WebSocket webSocket = null;
             for (String c : cookie) {
-                WebSocket webSocket = webSockets.get(c);
-                if (webSocket != null) {
-                    sessions.put(conn, sessions.get(webSocket));
-                    sessions.remove(webSocket);
-                    webSockets.put(c, conn);
+                WebSocket testWebSocket = webSockets.get(c);
+                if (testWebSocket == null) {
+                    continue;
                 }
+                correctCookie = c;
+                webSocket = testWebSocket;
+                break;
+            }
+            if (webSocket != null) {
+                sessions.put(conn, sessions.get(webSocket));
+                sessions.remove(webSocket);
+                webSockets.put(correctCookie, conn);
             }
         }
         Session session = sessions.get(conn);
         if (session == null) {
-            session = new Session(eventMap, fileEventMap, conn);
+            if (href == null) {
+                throw new RuntimeException("No href provided but session needs to be created");
+            }
+            if (!href.endsWith("/")) {
+                href += "/";
+            }
+            Page page = pages.get(href);
+            if (page == null) {
+                throw new RuntimeException("Page not found");
+            }
+            session = new Session(page, eventMap, fileEventMap, conn);
             sessions.put(conn, session);
             webSockets.put(session.getInternalCookie(), conn);
         } else {

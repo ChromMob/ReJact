@@ -173,6 +173,10 @@ public class Tag {
         return this;
     }
 
+    public String plainText() {
+        return plainText;
+    }
+
     public Map<String, Map<String, String>> getCssAttributes() {
         return cssAttributes;
     }
@@ -242,10 +246,25 @@ public class Tag {
     }
 
     private void setEvents(Map<EventTypes, BiConsumer<Session, HtmlElement>> events) {
-        events.forEach(this.events::put);
+        this.events.putAll(events);
     }
 
     private void setFileEvents(Map<EventTypes, TriConsumer<Session, FileProgress, File>> fileEvents) {
-        fileEvents.forEach(this.fileEvents::put);
+        this.fileEvents.putAll(fileEvents);
+    }
+
+    public Map<Tag, Map<EventTypes, BiConsumer<Session, HtmlElement>>> getAllEvents() {
+        Map<Tag, Map<EventTypes, BiConsumer<Session, HtmlElement>>> allEvents = new HashMap<>();
+        allEvents.put(this, getEvents());
+        getAllChildren().forEach(tag -> allEvents.put(tag, tag.getEvents()));
+        return allEvents;
+
+    }
+
+    public Map<Tag, Map<EventTypes, TriConsumer<Session, FileProgress, File>>> getAllFileEvents() {
+        Map<Tag, Map<EventTypes, TriConsumer<Session, FileProgress, File>>> allFileEvents = new HashMap<>();
+        allFileEvents.put(this, getFileEvents());
+        getAllChildren().forEach(tag -> allFileEvents.put(tag, tag.getFileEvents()));
+        return allFileEvents;
     }
 }

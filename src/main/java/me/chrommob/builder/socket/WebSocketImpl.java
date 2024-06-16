@@ -32,7 +32,7 @@ public class WebSocketImpl extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        Session session = webPageBuilder.getSession(conn, null);
+        Session session = webPageBuilder.getSession(null, conn, null);
         if (session != null) {
             session.setCloseTime(System.currentTimeMillis());
         }
@@ -41,17 +41,20 @@ public class WebSocketImpl extends WebSocketServer {
     @Override
     public void onMessage(WebSocket conn, String message) {
         String[] cookie = null;
+        String href = null;
         if (message.startsWith("session")) {
             String temp = message.substring(8);
-            cookie = temp.split(";");
+            String[] data = temp.split(" ");
+            cookie = data[0].split(";");
             for (int i = 0; i < cookie.length; i++) {
                 cookie[i] = cookie[i].trim();
                 if (cookie[i].contains("=")) {
                     cookie[i] = cookie[i].substring(cookie[i].indexOf("=") + 1);
                 }
             }
+            href = data[1].replaceAll("^.*://[^/]+", "");
         }
-        Session session = webPageBuilder.getSession(conn, cookie);
+        Session session = webPageBuilder.getSession(href, conn, cookie);
         if (message.startsWith("event")) {
             message = message.substring(6);
             HtmlElement htmlElement = gson.fromJson(message, HtmlElement.class);
@@ -93,7 +96,7 @@ public class WebSocketImpl extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, ByteBuffer message) {
-        Session session = webPageBuilder.getSession(conn, null);
+        Session session = webPageBuilder.getSession(null, conn, null);
         if (session == null) {
             return;
         }
