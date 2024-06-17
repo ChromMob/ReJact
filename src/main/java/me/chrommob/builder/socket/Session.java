@@ -17,11 +17,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Session {
-    private final Page page;
     private final List<String> messageQueue = new ArrayList<>();
     private final Map<String, String> cookies = new HashMap<>();
-    private final Map<EventTypes, List<Tag>> eventMap;
-    private final Map<EventTypes, List<Tag>> fileEventMap;
+    private final Map<EventTypes, Set<Tag>> eventMap;
+    private final Map<EventTypes, Set<Tag>> fileEventMap;
     private final Map<FileMessage, File> fileMap = new HashMap<>();
     private final Map<String, Consumer<HtmlElement>> htmlElementMap = new HashMap<>();
     private final Map<String, Consumer<HtmlElement>> hasElementMap = new HashMap<>();
@@ -32,10 +31,11 @@ public class Session {
     private final Map<String, BiConsumer<FileProgress, File>> fileMapCallback = new HashMap<>();
     private final Map<String, Consumer<File>> fileInfoMap = new HashMap<>();
     private WebSocket webSocket;
+    private Page page;
     private final String internalCookie;
     private long closeTime;
 
-    public Session(Page page, Map<EventTypes, List<Tag>> eventMap, Map<EventTypes, List<Tag>> fileEventMap, WebSocket webSocket) {
+    public Session(Page page, Map<EventTypes, Set<Tag>> eventMap, Map<EventTypes, Set<Tag>> fileEventMap, WebSocket webSocket) {
         this.page = page;
         this.eventMap = eventMap;
         this.fileEventMap = fileEventMap;
@@ -58,7 +58,7 @@ public class Session {
     }
 
     public void callEvent(EventTypes eventTypes, HtmlElement htmlElement) {
-        List<Tag> list = eventMap.get(eventTypes);
+        Set<Tag> list = eventMap.get(eventTypes);
         for (Tag tag : list) {
             String id = tag.getAttributes().get(GlobalAttributes.ID);
             if (id.equals(htmlElement.id())) {
@@ -69,7 +69,7 @@ public class Session {
     }
 
     public void callFileEvent(EventTypes eventTypes, FileProgress fileProgress, File file) {
-        List<Tag> list = fileEventMap.get(eventTypes);
+        Set<Tag> list = fileEventMap.get(eventTypes);
         for (Tag tag : list) {
             String id = tag.getAttributes().get(GlobalAttributes.ID);
             if (id.equals(file.id())) {
@@ -167,9 +167,6 @@ public class Session {
                         "            var start = part * 102400;\n" +
                         "            var end = Math.min((part + 1) * 102400, bytes.length);\n" +
                         "            var bytesPart = bytes.slice(start, end);\n" +
-                        "            if (part == 0) {\n" +
-                        "                console.log(bytesPart);\n" +
-                        "            }\n" +
                         "            var messageTypeBytesPart = new TextEncoder().encode(\"getFile\");\n" +
                         "            const newBytes = new Uint8Array(8 + idBytes.length + 4 + messageTypeBytes.length + bytesPart.length);\n" +
                         "            const view = new DataView(newBytes.buffer);\n" +
@@ -226,7 +223,7 @@ public class Session {
 
     public void hasElement(String username, Consumer<HtmlElement> consumer) {
         hasElementMap.put(username, consumer);
-        String js = "var element = document.getElementById('" + username + "'); sendMessage(\"fetch \" + JSON.stringify({sourceId: \"" + username + "\", id: \"" + username + "\", type: \"hasEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: element != undefined}));";
+        String js = "var element = document.getElementById('" + username + "'); sendMessage(\"fetch \" + JSON.stringify({sourceId: \"" + username + "\", id: \"" + username + "\", type: \"hasEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: (element != undefined).toString()}));";
         sendMessage(js);
     }
 
@@ -239,7 +236,7 @@ public class Session {
     public void hasLastChild(HtmlElement htmlElement, Consumer<HtmlElement> consumer) {
         lastChildMapExists.put(htmlElement.sourceId(), consumer);
         String id = htmlElement.id();
-        String js = "var element = document.getElementById(\"" + id + "\"); sendMessage(\"fetch \" + JSON.stringify({sourceId: \"" + id + "\", id: \"" + id + "\", type: \"hasLastEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: element.lastChild != undefined}));";
+        String js = "var element = document.getElementById(\"" + id + "\"); sendMessage(\"fetch \" + JSON.stringify({sourceId: \"" + id + "\", id: \"" + id + "\", type: \"hasLastEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: (element.lastChild != undefined).toString()}));";
         sendMessage(js);
     }
 
@@ -252,7 +249,7 @@ public class Session {
     public void hasFirstChild(HtmlElement htmlElement, Consumer<HtmlElement> consumer) {
         firstChildMapExists.put(htmlElement.id(), consumer);
         String id = htmlElement.id();
-        String js = "var element = document.getElementById(\"" + id + "\"); sendMessage(\"fetch \" + JSON.stringify({sourceId: \"" + id + "\", id: \"" + id + "\", type: \"hasFirstEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: element.firstChild != undefined}));";
+        String js = "var element = document.getElementById(\"" + id + "\"); sendMessage(\"fetch \" + JSON.stringify({sourceId: \"" + id + "\", id: \"" + id + "\", type: \"hasFirstEl\", innerHtml: \"\", outerHtml: \"\", eventValue: \"\", value: (element.firstChild != undefined).toString()}));";
         sendMessage(js);
     }
 
@@ -430,7 +427,7 @@ public class Session {
             for (EventTypes eventTypes1 : eventTypes) {
                 eventMap.compute(eventTypes1, (k, v) -> {
                     if (v == null) {
-                        v = new ArrayList<>();
+                        v = new HashSet<>();
                     }
                     v.add(tag1);
                     return v;
@@ -450,7 +447,7 @@ public class Session {
             for (EventTypes eventTypes1 : eventTypes) {
                 eventMap.compute(eventTypes1, (k, v) -> {
                     if (v == null) {
-                        v = new ArrayList<>();
+                        v = new HashSet<>();
                     }
                     v.remove(tag1);
                     return v;
@@ -478,6 +475,10 @@ public class Session {
         return fileMap;
     }
 
+    public Page getPage() {
+        return page;
+    }
+
     public static class FileMessage {
         private final String id;
         private final String eventType;
@@ -500,4 +501,8 @@ public class Session {
             return Objects.hash(id, eventType);
         }
     }
+
+	public void setPage(Page page2) {
+        page = page2;
+	}
 }

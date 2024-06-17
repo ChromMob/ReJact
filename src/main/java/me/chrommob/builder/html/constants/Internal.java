@@ -20,7 +20,7 @@ public class Internal {
             return size;
         }
     }
-    public static final List<String> IMAGE_TYPES = List.of("png", "jpg", "jpeg", "gif", "bmp");
+    public static final List<String> IMAGE_TYPES = List.of("png", "jpg", "jpeg", "gif", "bmp", "webp", "svg");
     public static final List<String> CHARS = List.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final String EVERYTHING = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

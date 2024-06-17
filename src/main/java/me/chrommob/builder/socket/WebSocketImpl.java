@@ -1,21 +1,22 @@
 package me.chrommob.builder.socket;
 
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
+
 import com.google.gson.Gson;
+
 import me.chrommob.builder.WebPageBuilder;
 import me.chrommob.builder.html.File;
 import me.chrommob.builder.html.FileProgress;
 import me.chrommob.builder.html.HtmlElement;
 import me.chrommob.builder.html.events.EventTypes;
-import org.java_websocket.WebSocket;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
-
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class WebSocketImpl extends WebSocketServer {
     private final Map<Session, Deque<String>> messageQueue = new HashMap<>();

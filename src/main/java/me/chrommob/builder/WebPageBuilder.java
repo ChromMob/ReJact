@@ -1,18 +1,11 @@
 package me.chrommob.builder;
 
-import io.javalin.Javalin;
-import jakarta.xml.bind.DatatypeConverter;
-import me.chrommob.builder.html.events.EventTypes;
-import me.chrommob.builder.html.tags.Tag;
-import me.chrommob.builder.socket.Session;
-import me.chrommob.builder.socket.WebSocketImpl;
-import org.java_websocket.WebSocket;
-import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -23,9 +16,26 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+
+import org.java_websocket.WebSocket;
+import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
+
+import io.javalin.Javalin;
+import jakarta.xml.bind.DatatypeConverter;
+import me.chrommob.builder.html.events.EventTypes;
+import me.chrommob.builder.html.tags.Tag;
+import me.chrommob.builder.socket.Session;
+import me.chrommob.builder.socket.WebSocketImpl;
 
 public class WebPageBuilder {
     private final String ip;
@@ -33,8 +43,8 @@ public class WebPageBuilder {
     private final Javalin app;
     private final Map<String, WebSocket> webSockets = new ConcurrentHashMap<>();
     private final Map<WebSocket, Session> sessions = new ConcurrentHashMap<>();
-    private final Map<EventTypes, List<Tag>> eventMap = new HashMap<>();
-    private final Map<EventTypes, List<Tag>> fileEventMap = new HashMap<>();
+    private final Map<EventTypes, Set<Tag>> eventMap = new HashMap<>();
+    private final Map<EventTypes, Set<Tag>> fileEventMap = new HashMap<>();
     private final Map<String, Page> pages = new HashMap<>();
 
     public WebPageBuilder(String ip, int webPort, int serverPort, int clientPort) {
@@ -71,7 +81,8 @@ public class WebPageBuilder {
                 }
                 for (Session session : sessions.values()) {
                     if (session.getCloseTime() != 0) {
-                        if (System.currentTimeMillis() - session.getCloseTime() > 10000 && session.getWebSocket().isClosed()) {
+                        if (System.currentTimeMillis() - session.getCloseTime() > 10000
+                                && session.getWebSocket().isClosed()) {
                             webSockets.remove(session.getInternalCookie());
                             sessions.remove(session.getWebSocket());
                         }
@@ -119,7 +130,7 @@ public class WebPageBuilder {
             KeyStore keystore = KeyStore.getInstance("JKS");
             keystore.load(null);
             keystore.setCertificateEntry("cert-alias", cert);
-            keystore.setKeyEntry("key-alias", key, password.toCharArray(), new Certificate[]{cert});
+            keystore.setKeyEntry("key-alias", key, password.toCharArray(), new Certificate[] { cert });
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(keystore, password.toCharArray());
@@ -162,7 +173,7 @@ public class WebPageBuilder {
         FileInputStream fis;
         try {
             fis = new FileInputStream(file);
-            fis.read(bytesArray); //read file into bytes[]
+            fis.read(bytesArray); // read file into bytes[]
             fis.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -202,7 +213,8 @@ public class WebPageBuilder {
         Session session = sessions.get(conn);
         if (session == null) {
             if (href == null) {
-                throw new RuntimeException("No href provided but session needs to be created");
+                throw new RuntimeException(
+                        "No href provided by: " + conn.getRemoteSocketAddress() + " but session needs to be created");
             }
             if (!href.endsWith("/")) {
                 href += "/";
@@ -217,10 +229,26 @@ public class WebPageBuilder {
         } else {
             session.setWebSocket(conn);
         }
+        if (href != null) {
+            session.setPage(pages.get(href));
+        }
         return session;
     }
 
     public List<Session> getActiveSessions() {
-        return this.sessions.values().stream().filter(session -> session.getWebSocket().isOpen()).collect(Collectors.toList());
+        return this.sessions.values().stream().filter(session -> session.getWebSocket().isOpen())
+                .collect(Collectors.toList());
+    }
+
+    public List<Session> getActiveSessionsByPage(Page page) {
+        return this.sessions.values().stream()
+                .filter(session -> session.getWebSocket().isOpen() && session.getPage() == page)
+                .collect(Collectors.toList());
+    }
+
+    public List<Session> getActiveSessionsByPage(String href) {
+        return this.sessions.values().stream()
+                .filter(session -> session.getWebSocket().isOpen() && session.getPage().getPath().equals(href))
+                .collect(Collectors.toList());
     }
 }

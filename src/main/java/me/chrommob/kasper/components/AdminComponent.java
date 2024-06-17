@@ -47,7 +47,12 @@ public class AdminComponent extends DivTag {
                 String username = usernameElement.value();
                 String password = passwordElement.value();
                 onUserAdded.accept(new User(username, password));
-                session.getHtmlElement("users", users -> session.addChild(users, new UserListComponent.UserComponent(username, onUserRemoved)));
+                session.getHtmlElement("users", users -> session.hasElement("username-" + username, userExists -> {
+                    if (userExists.value().equals("true")) {
+                        return;
+                    }
+                    session.addChild(users, new UserListComponent.UserComponent(username, onUserRemoved));
+                }));
             }))));
         }
     }
@@ -57,9 +62,9 @@ public class AdminComponent extends DivTag {
             super();
             addAttribute(ID, "users");
             css("default", "display", "grid").css("grid-template-columns", "1fr 1fr").css("grid-gap", "10px");
-            event(EventTypes.BEFORELOAD, (session, htmlElement) -> {
+            addDynamicDataHandler(v -> {
                 for (String user : users) {
-                    session.addChild(htmlElement, new UserComponent(user, onUserRemoved));
+                    addDynamicChild(new UserComponent(user, onUserRemoved));
                 }
             });
         }

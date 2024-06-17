@@ -1,30 +1,43 @@
 package me.chrommob.builder.html.tags;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import org.apache.commons.lang3.function.TriConsumer;
+
 import me.chrommob.builder.html.File;
 import me.chrommob.builder.html.FileProgress;
 import me.chrommob.builder.html.HtmlElement;
 import me.chrommob.builder.html.constants.GlobalAttributes;
+import static me.chrommob.builder.html.constants.GlobalAttributes.HREF;
+import static me.chrommob.builder.html.constants.GlobalAttributes.ID;
 import me.chrommob.builder.html.constants.Internal;
 import me.chrommob.builder.html.events.EventTypes;
 import me.chrommob.builder.socket.Session;
-import org.apache.commons.lang3.function.TriConsumer;
-
-import java.util.*;
-import java.util.function.BiConsumer;
-
-import static me.chrommob.builder.html.constants.GlobalAttributes.HREF;
-import static me.chrommob.builder.html.constants.GlobalAttributes.ID;
 
 public class Tag {
+    private final Set<Consumer<Void>> dynamicDataHandlers = new HashSet<>();
     private final Map<String, Map<String, String>> cssAttributes = new HashMap<>();
     private final String elementName;
     private final boolean newLineStart;
     private final boolean newLineEnd;
     private final List<Tag> children = new ArrayList<>();
+    private final List<Tag> dynamicChildren = new ArrayList<>();
     private final Map<GlobalAttributes, String> attributes = new HashMap<>();
     private String plainText;
     private final Map<EventTypes, BiConsumer<Session, HtmlElement>> events = new HashMap<>();
     private final Map<EventTypes, TriConsumer<Session, FileProgress, File>> fileEvents = new HashMap<>();
+
+    public boolean hasDynamicDataHandlers() {
+        return !dynamicDataHandlers.isEmpty();
+    }
 
     public Tag(String elementName, boolean newLineStart, boolean newLineEnd) {
         this.elementName = elementName;
@@ -38,6 +51,16 @@ public class Tag {
 
     public Tag() {
         this(null, false, true);
+    }
+
+    public void callDynamicDataHandlers() {
+        dynamicChildren.clear();
+        dynamicDataHandlers.forEach(handler -> handler.accept(null));
+    }
+
+    public Tag addDynamicChild(Tag child) {
+        dynamicChildren.add(child);
+        return this;
     }
 
     public Tag addChild(Tag child) {
@@ -102,7 +125,10 @@ public class Tag {
     }
 
     public List<Tag> getChildren() {
-        return children;
+        List<Tag> allChildren = new ArrayList<>();
+        allChildren.addAll(children);
+        allChildren.addAll(dynamicChildren);
+        return allChildren;
     }
 
     public List<Tag> getChildrenByClass(Class clazz) {
@@ -116,8 +142,7 @@ public class Tag {
     }
 
     public List<Tag> getAllChildren() {
-        List<Tag> allChildren = new ArrayList<>();
-        allChildren.addAll(getChildren());
+        List<Tag> allChildren = new ArrayList<>(getChildren());
         for (Tag child : getChildren()) {
             allChildren.addAll(child.getAllChildren());
         }
@@ -125,7 +150,7 @@ public class Tag {
     }
 
     public Map<GlobalAttributes, String> getAttributes() {
-        return attributes;
+        return new HashMap<>(attributes);
     }
 
     public String build(boolean noLineBreak) {
@@ -178,7 +203,7 @@ public class Tag {
     }
 
     public Map<String, Map<String, String>> getCssAttributes() {
-        return cssAttributes;
+        return new HashMap<>(cssAttributes);
     }
 
     public Tag href(String href) {
@@ -202,11 +227,11 @@ public class Tag {
     }
 
     public Map<EventTypes, BiConsumer<Session, HtmlElement>> getEvents() {
-        return events;
+        return new HashMap<>(events);
     }
 
     public Map<EventTypes, TriConsumer<Session, FileProgress, File>> getFileEvents() {
-        return fileEvents;
+        return new HashMap<>(fileEvents);
     }
 
     public String id() {
@@ -218,13 +243,11 @@ public class Tag {
         return id;
     }
 
+    @Override
     public Tag clone() {
-        Class<? extends Tag> clazz = this.getClass();
-        Tag tag = null;
-        try {
-            tag = clazz.getConstructor().newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+        Tag tag = new Tag(elementName, newLineStart, newLineEnd);
+        for (Consumer<Void> handler : getDynamicDataHandlers()) {
+            tag.addDynamicDataHandler(handler);
         }
         tag.setAttributes(getAttributes());
         tag.setCssAttributes(getCssAttributes());
@@ -266,5 +289,27 @@ public class Tag {
         allFileEvents.put(this, getFileEvents());
         getAllChildren().forEach(tag -> allFileEvents.put(tag, tag.getFileEvents()));
         return allFileEvents;
+    }
+
+    public Tag addDynamicDataHandler(Consumer<Void> handler) {
+        dynamicDataHandlers.add(handler);
+        return this;
+    }
+
+    private Set<Consumer<Void>> getDynamicDataHandlers() {
+        return dynamicDataHandlers;
+    }
+
+    public void removeChildByClass(Class<? extends Tag> class1) {
+        children.removeIf(class1::isInstance);
+    }
+
+    public Set<String> getClassNames() {
+        Set<String> classNames = new HashSet<>();
+        String attribute = attributes.get(GlobalAttributes.CLASS);
+        if (attribute != null && !attribute.isEmpty()) {
+            classNames.addAll(Arrays.asList(attribute.split(" ")));
+        }
+        return classNames;
     }
 }

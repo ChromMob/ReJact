@@ -77,7 +77,7 @@ public class EventBuilders {
                     "    \"eventValue\": \"\",\n" +
                     "    \"value\": \"\"\n" +
                     "};\n" +
-                    "sendMessage(\"event \" + JSON.stringify(json));\n";
+                    "sendMessage(message_type + \" \" + JSON.stringify(json));\n";
         }
     };
     public static final EventBuilder global = new EventBuilder() {

@@ -23,51 +23,68 @@ public class Page {
     private final String path;
     private final String ip;
     private final int clientPort;
-    private final Map<EventTypes, List<Tag>> eventMap;
-    private final Map<EventTypes, List<Tag>> fileEventMap;
-    private final Map<EventTypes, List<Tag>> localEventMap = new HashMap<>();
-    private final Map<EventTypes, List<Tag>> localFileEventMap = new HashMap<>();
-    public Page(String path, String ip, int clientPort, Map<EventTypes, List<Tag>> eventMap, Map<EventTypes, List<Tag>> fileEventMap) {
+    private final Map<EventTypes, Set<Tag>> eventMap;
+    private final Map<EventTypes, Set<Tag>> fileEventMap;
+    private final Map<EventTypes, Set<Tag>> localEventMap = new HashMap<>();
+    private final Map<EventTypes, Set<Tag>> localFileEventMap = new HashMap<>();
+
+    public Page(String path, String ip, int clientPort, Map<EventTypes, Set<Tag>> eventMap,
+            Map<EventTypes, Set<Tag>> fileEventMap) {
         this.path = path;
         this.ip = ip;
         this.clientPort = clientPort;
         this.eventMap = eventMap;
         this.fileEventMap = fileEventMap;
     }
+    
     private final Tag root = new RootHtmlTag();
-    private final CSSBuilder css = new CSSBuilder();
+    private CSSBuilder cssBuilder;
 
     private String cssString;
     private String htmlString;
+    private boolean hasDynamicDataHandlers;
 
     public void build() {
-        cssString = buildCss();
-        htmlString = buildHtml();
+        cssBuilder = new CSSBuilder();
+
+        localEventMap.clear();
+        localFileEventMap.clear();
+
+        List<Tag> tags = root.getAllChildren();
+
+        hasDynamicDataHandlers = tags.stream().anyMatch(Tag::hasDynamicDataHandlers);
+        tags.forEach(Tag::callDynamicDataHandlers);
+
+        tags = root.getAllChildren();
+
+        cssString = buildCss(tags);
+        htmlString = buildHtml(tags);
     }
 
     public String getHtmlString() {
-        if (htmlString == null) {
+        if (htmlString == null || hasDynamicDataHandlers) {
             build();
         }
         return htmlString;
     }
 
-    private String buildHtml() {
-        List<Tag> tags = root.getAllChildren();
+    private String buildHtml(List<Tag> tags) {
         for (Tag tag : tags) {
             for (Map.Entry<EventTypes, BiConsumer<Session, HtmlElement>> entry : tag.getEvents().entrySet()) {
-                List<Tag> list = eventMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>());
-                List<Tag> localList = localEventMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>());
+                Set<Tag> list = eventMap.computeIfAbsent(entry.getKey(), k -> new HashSet<>());
+                Set<Tag> localList = localEventMap.computeIfAbsent(entry.getKey(), k -> new HashSet<>());
                 list.add(tag);
                 localList.add(tag);
             }
-            for (Map.Entry<EventTypes, TriConsumer<Session, FileProgress, me.chrommob.builder.html.File>> entry : tag.getFileEvents().entrySet()) {
-                List<Tag> list = fileEventMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>());
-                List<Tag> localList = localFileEventMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>());
+            for (Map.Entry<EventTypes, TriConsumer<Session, FileProgress, me.chrommob.builder.html.File>> entry : tag
+                    .getFileEvents().entrySet()) {
+                Set<Tag> list = fileEventMap.computeIfAbsent(entry.getKey(), k -> new HashSet<>());
+                Set<Tag> localList = localFileEventMap.computeIfAbsent(entry.getKey(), k -> new HashSet<>());
                 list.add(tag);
                 localList.add(tag);
             }
         }
+        root.removeChildByClass(ScriptTag.class);
         root.addChild(new ScriptTag(buildEventScript()));
         List<Tag> htmlTags = root.getChildrenByClass(HtmlTag.class);
         if (htmlTags.isEmpty()) {
@@ -82,7 +99,19 @@ public class Page {
         } else {
             headTag = headTags.stream().findFirst().orElse(null);
         }
-        headTag.addChild(new BaseTag().addAttribute(HREF, path.endsWith("/") ? path : path + "/"));
+        List<Tag> baseTags = headTag.getChildrenByClass(BaseTag.class);
+        String path = this.path.endsWith("/") ? this.path : this.path + "/";
+        if (baseTags.isEmpty()) {
+            headTag.addChild(new BaseTag().addAttribute(HREF, path));
+        } else {
+            //Find if any has href attribute
+            Tag baseTag = baseTags.stream().filter(tag -> tag.getAttributes().get(HREF) != null).findFirst()
+                    .orElse(null);
+            if (baseTag == null) {
+                headTag.addChild(new BaseTag().addAttribute(HREF, path));
+            }
+        }
+        htmlTag.removeChildByClass(StyleTag.class);
         htmlTag.addChild(new StyleTag().plainText(cssString));
         return root.build(false);
     }
@@ -90,14 +119,14 @@ public class Page {
     private String buildEventScript() {
         StringBuilder builder = new StringBuilder();
         for (EventTypes eventTypes : localEventMap.keySet()) {
-            List<Tag> list = localEventMap.get(eventTypes);
+            Set<Tag> list = localEventMap.get(eventTypes);
             List<String> ids = list.stream().map(Tag::id).toList();
             String idsString = ids.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(","));
             builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString).append("];\n");
             builder.append(eventTypes.build());
         }
         for (EventTypes eventTypes : localFileEventMap.keySet()) {
-            List<Tag> list = localFileEventMap.get(eventTypes);
+            Set<Tag> list = localFileEventMap.get(eventTypes);
             List<String> ids = list.stream().map(Tag::id).toList();
             String idsString = ids.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(","));
             builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString).append("];\n");
@@ -106,23 +135,43 @@ public class Page {
         return builder.toString();
     }
 
-    private String buildCss() {
-        List<Tag> tags = root.getAllChildren();
+    private String buildCss(List<Tag> tags) {
+        Set<String> classNames = new HashSet<>();
         for (Tag tag : tags) {
-            String className = Internal.generateRandomString(20);
-            tag.addClassName(className);
+            boolean ownClassName = false;
+            String usedClassName;
+            Set<String> classNames1 = tag.getClassNames();
+            if (classNames1.isEmpty()) {
+                usedClassName = Internal.generateRandomString(20);
+            } else {
+                Iterator<String> iterator = classNames1.iterator();
+                String candidate = iterator.next();
+                while ((classNames.contains(candidate) || candidate.equals("hidden")) && iterator.hasNext()) {
+                    candidate = iterator.next();
+                }
+                if (candidate == null || classNames.contains(candidate) || candidate.equals("hidden")) {
+                    usedClassName = Internal.generateRandomString(20);
+                } else {
+                    usedClassName = candidate;
+                    ownClassName = true;
+                }
+            }
+            classNames.add(usedClassName);
+            if (!ownClassName) {
+                tag.addClassName(usedClassName);
+            }
             for (Map.Entry<String, Map<String, String>> entry : tag.getCssAttributes().entrySet()) {
                 String selector = entry.getKey();
                 if (selector.equals("default")) {
                     selector = null;
                 }
                 Map<String, String> css = entry.getValue();
-                this.css.addClass(className + (selector == null ? "" : selector), css);
+                cssBuilder.addClass(usedClassName + (selector == null ? "" : selector), css);
             }
         }
 
-        css.addClass("hidden", "display", "none");
-        return css.build();
+        cssBuilder.addClass("hidden", "display", "none");
+        return cssBuilder.build();
     }
 
     public Tag root() {

@@ -1,17 +1,41 @@
 package me.chrommob.test;
 
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+
 import me.chrommob.builder.Page;
 import me.chrommob.builder.WebPageBuilder;
 import me.chrommob.builder.html.constants.GlobalAttributes;
+import static me.chrommob.builder.html.constants.GlobalAttributes.CHARSET;
+import static me.chrommob.builder.html.constants.GlobalAttributes.CONTENT;
+import static me.chrommob.builder.html.constants.GlobalAttributes.FOR;
+import static me.chrommob.builder.html.constants.GlobalAttributes.HREF;
+import static me.chrommob.builder.html.constants.GlobalAttributes.ID;
+import static me.chrommob.builder.html.constants.GlobalAttributes.LANG;
+import static me.chrommob.builder.html.constants.GlobalAttributes.NAME;
+import static me.chrommob.builder.html.constants.GlobalAttributes.SRC;
+import static me.chrommob.builder.html.constants.GlobalAttributes.TYPE;
 import me.chrommob.builder.html.constants.HeadingLevel;
 import me.chrommob.builder.html.constants.Internal;
 import me.chrommob.builder.html.events.EventTypes;
-import me.chrommob.builder.html.tags.*;
+import me.chrommob.builder.html.tags.ATag;
+import me.chrommob.builder.html.tags.BodyTag;
+import me.chrommob.builder.html.tags.BoldTag;
+import me.chrommob.builder.html.tags.ButtonTag;
+import me.chrommob.builder.html.tags.DivTag;
+import me.chrommob.builder.html.tags.HeadTag;
+import me.chrommob.builder.html.tags.HeadingTag;
+import me.chrommob.builder.html.tags.HtmlTag;
+import me.chrommob.builder.html.tags.ImageTag;
+import me.chrommob.builder.html.tags.InputTag;
+import me.chrommob.builder.html.tags.LabelTag;
+import me.chrommob.builder.html.tags.MetaTag;
+import me.chrommob.builder.html.tags.ParagraphTag;
+import me.chrommob.builder.html.tags.Tag;
+import me.chrommob.builder.html.tags.TitleTag;
+import me.chrommob.builder.html.tags.ULTag;
 import me.chrommob.builder.socket.Session;
-
-import java.util.*;
-
-import static me.chrommob.builder.html.constants.GlobalAttributes.*;
 
 public class TestPage {
     private final WebPageBuilder builder;
@@ -82,7 +106,7 @@ public class TestPage {
             return;
         }
         Tag sessionList = new ULTag().css("default", "display", "grid").css("grid-template-columns", "1fr 1fr").css("grid-gap", "10px");
-        for (Session sessions : builder.getActiveSessions()) {
+        for (Session sessions : builder.getActiveSessionsByPage("/")) {
             if (ignoreCurrentUser && sourceSession == sessions) {
                 continue;
             }
@@ -91,7 +115,7 @@ public class TestPage {
             }
             sessionList.addChild(new ParagraphTag().plainText(sessions.getCookie("username")));
         }
-        for (Session sessions : builder.getActiveSessions()) {
+        for (Session sessions : builder.getActiveSessionsByPage("/")) {
             sessions.getHtmlElement("users", users -> {
                 sessions.setInnerHtml(users, sessionList);
             });
@@ -100,14 +124,24 @@ public class TestPage {
 
     static class Chat extends Tag {
         private final WebPageBuilder webPageBuilder;
-        private final Map<String, Long> typingUsers = new HashMap<>();
         //
         public Chat(WebPageBuilder webPageBuilder) {
             super("div");
             this.webPageBuilder = webPageBuilder;
 
             Tag messages = new DivTag().css("overflow-y", "scroll").css("height", "600px").css("background-color", "#eee")
-                            .css("overflow-x", "hidden").css("padding", "10px");
+                    .css("overflow-x", "hidden").css("padding", "10px");
+            messages.addDynamicDataHandler(v -> {
+                for (int i = 0; i < TestPage.messages.size(); i++) {
+                    Message message = TestPage.messages.get(i);
+                    Tag messageTag = message.message().clone();
+                    boolean isLastMessage = i == TestPage.messages.size() - 1;
+                    if (isLastMessage) {
+                        messageTag.addAttribute(GlobalAttributes.ID, "lastMessage");
+                    }
+                    messages.addDynamicChild(messageTag);
+                }
+            });
             css("background-color", "#fff").css("padding", "20px").css("border-radius", "5px")
                     .css("box-shadow", "0 0 10px rgba(0, 0, 0, 0.1)");
             addChild(new HeadingTag(HeadingLevel.H2).plainText("Chat"));
@@ -116,17 +150,6 @@ public class TestPage {
                     .addChild(messages
                             .addAttribute(GlobalAttributes.ID, "messages")
                             .css(" *", "max-width", "100%").css(" *", "margin", "2px")
-                            .event(EventTypes.BEFORELOAD, (session, htmlElement) -> {
-                                for (int i = 0; i < TestPage.messages.size(); i++) {
-                                    Message message = TestPage.messages.get(i);
-                                    Tag messageTag = message.message().clone();
-                                    boolean isLastMessage = i == TestPage.messages.size() - 1;
-                                    if (isLastMessage) {
-                                        messageTag.addAttribute(GlobalAttributes.ID, "lastMessage");
-                                    }
-                                    session.addChild(htmlElement, messageTag);
-                                }
-                            })
                             .event(EventTypes.LOAD, (session, htmlElement) -> {
                                 session.scrollTo("lastMessage");
                             })
@@ -154,7 +177,7 @@ public class TestPage {
         }
 
         private void chat(Session sourceSession) {
-            if (webPageBuilder.getActiveSessions() == null) {
+            if (webPageBuilder.getActiveSessionsByPage("/") == null) {
                 return;
             }
             sourceSession.getFileInfo("file", fileData -> {
@@ -193,7 +216,7 @@ public class TestPage {
                 }
                 TestPage.messages.add(new TestPage.Message(username, messageTag));
                 Tag finalMessageTag = messageTag.clone();
-                for (Session session : webPageBuilder.getActiveSessions()) {
+                for (Session session : webPageBuilder.getActiveSessionsByPage("/")) {
                     session.getHtmlElement("messages", messages -> {
                         session.hasLastChild(messages, exists -> {
                             if (exists.value().equals("true")) {
@@ -210,7 +233,7 @@ public class TestPage {
         }
     }
 
-    static class Header extends DivTag {
+    public static class Header extends DivTag {
         public Header() {
             super();
             css("background-color", "#333").css("overflow", "hidden").css("display", "flex").css("align-items", "start")
@@ -219,7 +242,7 @@ public class TestPage {
                             .event(EventTypes.CLICK, (session, htmlElement) -> session.clearCookies()));
         }
 
-        static class HeaderButton extends ATag {
+        public static class HeaderButton extends ATag {
             public HeaderButton(boolean highlighted, String url, String text) {
                 super();
                 addAttribute(HREF, url).plainText(text)
