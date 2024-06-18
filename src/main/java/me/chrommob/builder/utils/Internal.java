@@ -1,4 +1,4 @@
-package me.chrommob.builder.html.constants;
+package me.chrommob.builder.utils;
 
 import java.util.List;
 import java.util.Random;

@@ -1,8 +1,8 @@
 package me.chrommob.builder.html;
 
-import me.chrommob.builder.html.constants.Internal;
-
 import java.util.Objects;
+
+import me.chrommob.builder.utils.Internal;
 
 public final class HtmlElement {
     private final String sourceId;

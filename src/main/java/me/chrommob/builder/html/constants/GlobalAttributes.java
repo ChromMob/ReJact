@@ -11,5 +11,7 @@ public enum GlobalAttributes {
     CONTENT,
     TYPE,
     FOR,
-    SRC
+    SRC,
+    WIDTH,
+    HEIGHT
 }

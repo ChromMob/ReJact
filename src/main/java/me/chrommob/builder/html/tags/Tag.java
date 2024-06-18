@@ -18,9 +18,10 @@ import me.chrommob.builder.html.HtmlElement;
 import me.chrommob.builder.html.constants.GlobalAttributes;
 import static me.chrommob.builder.html.constants.GlobalAttributes.HREF;
 import static me.chrommob.builder.html.constants.GlobalAttributes.ID;
-import me.chrommob.builder.html.constants.Internal;
+
 import me.chrommob.builder.html.events.EventTypes;
 import me.chrommob.builder.socket.Session;
+import me.chrommob.builder.utils.Internal;
 
 public class Tag {
     private final Set<Consumer<Void>> dynamicDataHandlers = new HashSet<>();
@@ -241,23 +242,6 @@ public class Tag {
             addAttribute(ID, id);
         }
         return id;
-    }
-
-    @Override
-    public Tag clone() {
-        Tag tag = new Tag(elementName, newLineStart, newLineEnd);
-        for (Consumer<Void> handler : getDynamicDataHandlers()) {
-            tag.addDynamicDataHandler(handler);
-        }
-        tag.setAttributes(getAttributes());
-        tag.setCssAttributes(getCssAttributes());
-        for (Tag child : getChildren()) {
-            tag.addChild(child.clone());
-        }
-        tag.setEvents(getEvents());
-        tag.setFileEvents(getFileEvents());
-        tag.plainText(plainText);
-        return tag;
     }
 
     private void setCssAttributes(Map<String, Map<String, String>> cssAttributes) {

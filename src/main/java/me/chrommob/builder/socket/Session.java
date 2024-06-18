@@ -5,9 +5,10 @@ import me.chrommob.builder.html.File;
 import me.chrommob.builder.html.FileProgress;
 import me.chrommob.builder.html.HtmlElement;
 import me.chrommob.builder.html.constants.GlobalAttributes;
-import me.chrommob.builder.html.constants.Internal;
 import me.chrommob.builder.html.events.EventTypes;
 import me.chrommob.builder.html.tags.*;
+import me.chrommob.builder.utils.Internal;
+
 import org.apache.commons.lang3.function.TriConsumer;
 import org.java_websocket.WebSocket;
 import org.jetbrains.annotations.NotNull;

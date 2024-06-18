@@ -1,6 +1,6 @@
 package me.chrommob.builder.html;
 
-import me.chrommob.builder.html.constants.Internal;
+import me.chrommob.builder.utils.Internal;
 
 public class File {
     private final boolean exists;

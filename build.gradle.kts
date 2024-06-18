@@ -25,6 +25,8 @@ java {
 }
 
 dependencies {
+    implementation("com.sksamuel.scrimage:scrimage-core:4.1.2")
+    implementation("com.sksamuel.scrimage:scrimage-webp:4.1.2")    
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
     implementation("io.javalin:javalin:6.1.3")

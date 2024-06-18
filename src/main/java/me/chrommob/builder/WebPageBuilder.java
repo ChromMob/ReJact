@@ -36,6 +36,7 @@ import me.chrommob.builder.html.events.EventTypes;
 import me.chrommob.builder.html.tags.Tag;
 import me.chrommob.builder.socket.Session;
 import me.chrommob.builder.socket.WebSocketImpl;
+import me.chrommob.builder.utils.ImageOptimiser;
 
 public class WebPageBuilder {
     private final String ip;
@@ -71,6 +72,7 @@ public class WebPageBuilder {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        new ImageOptimiser(app);
 
         new Thread(() -> {
             while (true) {
@@ -248,7 +250,8 @@ public class WebPageBuilder {
 
     public List<Session> getActiveSessionsByPage(String href) {
         return this.sessions.values().stream()
-                .filter(session -> session.getWebSocket().isOpen() && session.getPage().getPath().equals(href))
+                .filter(session -> session.getWebSocket().isOpen() && session.getPage() != null
+                        && session.getPage().getPath().equals(href))
                 .collect(Collectors.toList());
     }
 }
