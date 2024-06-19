@@ -5,17 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Merging">
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/Page.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/Page.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/WebPageBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/WebPageBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/constants/Internal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/constants/Internal.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/events/EventBuilders.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/events/EventBuilders.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/Tag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/Tag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/AdminComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/AdminComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/test/TestPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/test/TestPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/KasperPage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/AdminComponent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/LoginComponent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/products/DayJson.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/products/ProductComponent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/products/ProductType.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
