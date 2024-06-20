@@ -48,8 +48,10 @@ public class CalendarPage {
     class Calendar extends DivTag {
         public Calendar() {
             super();
-            css("background-color", RGB_BACKGROUND);
+            css("background-color", RGB_BACKGROUND).css("display", "contents");
         }
+
+
     }
 
 

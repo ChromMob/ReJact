@@ -29,6 +29,7 @@ public class WebSocketImpl extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        System.out.println("WebSocket opened: " + conn.getRemoteSocketAddress() + " " + conn);
     }
 
     @Override
@@ -41,6 +42,7 @@ public class WebSocketImpl extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
+        System.out.println("WebSocket message: " + conn.getRemoteSocketAddress() + " " + message + " " + conn);
         String[] cookie = null;
         String href = null;
         if (message.startsWith("session")) {

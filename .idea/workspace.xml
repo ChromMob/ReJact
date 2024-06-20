@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Improve css parsing, start working on Calendar showcase to show we are better than hey.">
+    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Make ImageOptimer#optimise() return a CompletableFuture&lt;String&gt; so we can keep doing stuff in the background">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/ImageTag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/ImageTag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/utils/ImageOptimiser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/utils/ImageOptimiser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/test/TestPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/test/TestPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/Tag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/Tag.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/WebSocketImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/WebSocketImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/calendar/CalendarPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/calendar/CalendarPage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,7 +178,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718889499318</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Make ImageOptimer#optimise() return a CompletableFuture&lt;String&gt; so we can keep doing stuff in the background">
+      <option name="closed" value="true" />
+      <created>1718902200175</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1718902200175</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -188,6 +196,7 @@
     <MESSAGE value="Update script.js" />
     <MESSAGE value="Remove useless stuff because open sourcing" />
     <MESSAGE value="Improve css parsing, start working on Calendar showcase to show we are better than hey." />
-    <option name="LAST_COMMIT_MESSAGE" value="Improve css parsing, start working on Calendar showcase to show we are better than hey." />
+    <MESSAGE value="Make ImageOptimer#optimise() return a CompletableFuture&lt;String&gt; so we can keep doing stuff in the background" />
+    <option name="LAST_COMMIT_MESSAGE" value="Make ImageOptimer#optimise() return a CompletableFuture&lt;String&gt; so we can keep doing stuff in the background" />
   </component>
 </project>

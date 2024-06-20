@@ -154,16 +154,36 @@ public class Tag {
         return new HashMap<>(attributes);
     }
 
+    private String front = null;
+    private String middle = null;
+    private String back = null;
     public String build(boolean noLineBreak) {
         StringBuilder builder = new StringBuilder();
-        builder.append(renderFront(noLineBreak));
-        if (plainText != null) {
-            builder.append(plainText).append(getChildren().isEmpty() ? "" : (noLineBreak ? "" : System.lineSeparator()));
+        if (front != null) {
+            builder.append(front);
+        } else {
+            front = renderFront(noLineBreak);
+            builder.append(front);
+        }
+        if (middle != null) {
+            builder.append(middle);
+        } else {
+            StringBuilder middleBuilder = new StringBuilder();
+            if (plainText != null) {
+                middleBuilder.append(plainText).append(getChildren().isEmpty() ? "" : (noLineBreak ? "" : System.lineSeparator()));
+            }
+            middle = middleBuilder.toString();
+            builder.append(middle);
         }
         for (Tag child : getChildren()) {
             builder.append(child.build(noLineBreak));
         }
-        builder.append(renderPost(noLineBreak));
+        if (back != null) {
+            builder.append(back);
+        } else {
+            back = renderPost(noLineBreak);
+            builder.append(back);
+        }
         return builder.toString();
     }
 
