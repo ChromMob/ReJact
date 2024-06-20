@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import com.sksamuel.scrimage.ImmutableImage;
 import com.sksamuel.scrimage.nio.AnimatedGif;
@@ -46,10 +47,17 @@ public class ImageOptimiser {
         internalPath.mkdirs();
     }
 
-    public static String optimise(byte[] imageData, boolean isGif) {
+    public static String optimise(byte[] imageData, boolean isGif, boolean isWebp) {
         String name = Internal.generateRandomString(20);
 
+
         File out = new File(internalPath, name + ".webp");
+
+        if (isWebp) {
+            FileUtils.writeFile(out, imageData);
+            return "/_rejact/images/" + name + ".webp";
+        }
+
         try {
             List<ImageReader> imageReaders = new ArrayList<>();
             imageReaders.add(new PngReader());

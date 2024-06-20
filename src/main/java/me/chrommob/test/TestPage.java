@@ -3,6 +3,7 @@ package me.chrommob.test;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import me.chrommob.builder.Page;
 import me.chrommob.builder.WebPageBuilder;
@@ -35,6 +36,7 @@ import me.chrommob.builder.html.tags.Tag;
 import me.chrommob.builder.html.tags.TitleTag;
 import me.chrommob.builder.html.tags.ULTag;
 import me.chrommob.builder.socket.Session;
+import me.chrommob.builder.utils.ImageOptimiser;
 import me.chrommob.builder.utils.Internal;
 
 public class TestPage {
@@ -46,7 +48,7 @@ public class TestPage {
         build();
     }
 
-    public record Message(String username, String message, String imageData, boolean isGif) {
+    public record Message(String username, String message, String imageData) {
     }
 
     private void build() {
@@ -136,7 +138,7 @@ public class TestPage {
                 for (int i = 0; i < TestPage.messages.size(); i++) {
                     Message message = TestPage.messages.get(i);
                     Tag messageTag = new TestPage.MessageTag(message.username(), message.message(),
-                            message.imageData(), message.isGif());
+                            message.imageData());
                     boolean isLastMessage = i == TestPage.messages.size() - 1;
                     if (isLastMessage) {
                         messageTag.addAttribute(GlobalAttributes.ID, "lastMessage");
@@ -196,16 +198,16 @@ public class TestPage {
                         }
                         sourceSession.hide("progressName");
                         sourceSession.hide("progress");
-                        postMessage(sourceSession, callBackFile.data(), fileData.type().contains("gif"));
+                        postMessage(sourceSession, callBackFile.data(), fileData.type().contains("gif"), fileData.type().contains("webp"));
                         sourceSession.clearValue("file");
                     });
                     return;
                 }
-                postMessage(sourceSession, null, false);
+                postMessage(sourceSession, null, false, false);
             });
         }
 
-        private void postMessage(Session sourceSession, byte[] imageData, boolean isGif) {
+        private void postMessage(Session sourceSession, byte[] imageData, boolean isGif, boolean isWebp) {
             sourceSession.getHtmlElement("message", message -> {
                 String messageValue = message.value();
                 sourceSession.setValue("message", "");
@@ -213,23 +215,30 @@ public class TestPage {
                 if (username == null) {
                     return;
                 }
-                Tag messageTag = new TestPage.MessageTag(username, messageValue, imageData, isGif);
-                Tag image = messageTag.getChildrenByClass(ImageTag.class).stream().findFirst().orElse(null);
-                String link = image == null ? null : image.getAttributes().get(SRC);
-                TestPage.messages.add(new TestPage.Message(username, messageValue, link, isGif));
-                for (Session session : webPageBuilder.getActiveSessionsByPage("/chat/")) {
-                    session.getHtmlElement("messages", messages -> {
-                        session.hasLastChild(messages, exists -> {
-                            if (exists.value().equals("true")) {
-                                session.getLastChild(messages, lastMessageElement -> {
-                                    session.removeAttribute(lastMessageElement, GlobalAttributes.ID);
-                                });
-                            }
-                            session.addChild(messages, messageTag.addAttribute(ID, "lastMessage"));
-                            session.scrollTo("lastMessage");
+                MessageTag messageTag = new MessageTag(username, messageValue, imageData, isGif, isWebp);
+                messageTag.getImageLink().thenAccept(link -> {
+                    if (link != null) {
+                        Tag image = messageTag.getChildrenByClass(ImageTag.class).stream().findFirst().orElse(null);
+                        assert image != null;
+                        image.addAttribute(SRC, link);
+                    }
+
+                    TestPage.messages.add(new TestPage.Message(username, messageValue, link));
+
+                    for (Session session : webPageBuilder.getActiveSessionsByPage("/chat/")) {
+                        session.getHtmlElement("messages", messages -> {
+                            session.hasLastChild(messages, exists -> {
+                                if (exists.value().equals("true")) {
+                                    session.getLastChild(messages, lastMessageElement -> {
+                                        session.removeAttribute(lastMessageElement, GlobalAttributes.ID);
+                                    });
+                                }
+                                session.addChild(messages, messageTag.addAttribute(ID, "lastMessage"));
+                                session.scrollTo("lastMessage");
+                            });
                         });
-                    });
-                }
+                    }
+                });
             });
         }
     }
@@ -280,21 +289,31 @@ public class TestPage {
     }
 
     public static class MessageTag extends DivTag {
-        public MessageTag(String username, String message, byte[] imageData, boolean isGif) {
+        private CompletableFuture<String> imageLink;
+        public MessageTag(String username, String message, byte[] imageData, boolean isGif, boolean isWebp) {
             super();
             addChild(new BoldTag().plainText(username + ": "));
             addChild(new ParagraphTag().plainText(message));
             if (imageData != null) {
-                addChild(new ImageTag().setImage(imageData, isGif));
+                ImageTag image = new ImageTag();
+                addChild(image);
+                imageLink = CompletableFuture.supplyAsync(() -> ImageOptimiser.optimise(imageData, isGif, isWebp));
             }
         }
 
-        public MessageTag(String username, String message, String imageData, boolean isGif) {
+        public CompletableFuture<String> getImageLink() {
+            if (imageLink == null) {
+                return CompletableFuture.completedFuture(null);
+            }
+            return imageLink;
+        }
+
+        public MessageTag(String username, String message, String imageLink) {
             super();
             addChild(new BoldTag().plainText(username + ": "));
             addChild(new ParagraphTag().plainText(message));
-            if (imageData != null) {
-                addChild(new ImageTag().addAttribute(SRC, imageData));
+            if (imageLink != null) {
+                addChild(new ImageTag().addAttribute(SRC, imageLink));
             }
         }
     }
