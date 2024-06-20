@@ -50,7 +50,7 @@ public class TestPage {
     }
 
     private void build() {
-        Page homePage = builder.newPage("/");
+        Page homePage = builder.newPage("/chat/");
         homePage.root().addChild(new HtmlTag().addAttribute(LANG, "en")
                 .addChild(new HeadTag().addChild(new TitleTag().plainText("ReJact"))
                         .addChild(new MetaTag().addAttribute(CHARSET, "utf-8"))
@@ -75,7 +75,7 @@ public class TestPage {
             if (username == null) {
                 return;
             }
-            session.redirect("/");
+            session.redirect("/chat/");
         })
                 .addAttribute(LANG, "en")
                 .addChild(new HeadTag().addChild(new TitleTag().plainText("Login"))
@@ -91,9 +91,9 @@ public class TestPage {
                                         .event(EventTypes.CLICK, (session, htmlElement) -> session
                                                 .getHtmlElement("username", htmlElement1 -> {
                                                     session.setCookie("username", htmlElement1.value());
-                                                    session.redirect("/");
+                                                    session.redirect("/chat/");
                                                 }))))));
-        homePage.build();
+//        homePage.build();
         loginPage.build();
     }
 
@@ -105,7 +105,7 @@ public class TestPage {
         }
         Tag sessionList = new ULTag().css("default", "display", "grid").css("grid-template-columns", "1fr 1fr")
                 .css("grid-gap", "10px");
-        for (Session sessions : builder.getActiveSessionsByPage("/")) {
+        for (Session sessions : builder.getActiveSessionsByPage("/chat/")) {
             if (ignoreCurrentUser && sourceSession == sessions) {
                 continue;
             }
@@ -114,7 +114,7 @@ public class TestPage {
             }
             sessionList.addChild(new ParagraphTag().plainText(sessions.getCookie("username")));
         }
-        for (Session sessions : builder.getActiveSessionsByPage("/")) {
+        for (Session sessions : builder.getActiveSessionsByPage("/chat/")) {
             sessions.getHtmlElement("users", users -> {
                 sessions.setInnerHtml(users, sessionList);
             });
@@ -181,7 +181,7 @@ public class TestPage {
         }
 
         private void chat(Session sourceSession) {
-            if (webPageBuilder.getActiveSessionsByPage("/") == null) {
+            if (webPageBuilder.getActiveSessionsByPage("/chat/") == null) {
                 return;
             }
             sourceSession.getFileInfo("file", fileData -> {
@@ -217,7 +217,7 @@ public class TestPage {
                 Tag image = messageTag.getChildrenByClass(ImageTag.class).stream().findFirst().orElse(null);
                 String link = image == null ? null : image.getAttributes().get(SRC);
                 TestPage.messages.add(new TestPage.Message(username, messageValue, link, isGif));
-                for (Session session : webPageBuilder.getActiveSessionsByPage("/")) {
+                for (Session session : webPageBuilder.getActiveSessionsByPage("/chat/")) {
                     session.getHtmlElement("messages", messages -> {
                         session.hasLastChild(messages, exists -> {
                             if (exists.value().equals("true")) {
@@ -238,7 +238,7 @@ public class TestPage {
         public Header() {
             super();
             css("background-color", "#333").css("overflow", "hidden").css("display", "flex").css("align-items", "start")
-                    .addChild(new HeaderButton(true, "/", "ReJact"))
+                    .addChild(new HeaderButton(true, "/chat/", "ReJact"))
                     .addChild(new HeaderButton(false, "/login", "Logout")
                             .event(EventTypes.CLICK, (session, htmlElement) -> session.clearCookies()));
         }
@@ -274,7 +274,7 @@ public class TestPage {
                                     return;
                                 }
                                 session.setCookie("username", key.value());
-                                session.redirect("/");
+                                session.redirect("/chat/");
                             })));
         }
     }

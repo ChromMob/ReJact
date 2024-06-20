@@ -249,9 +249,13 @@ public class WebPageBuilder {
     }
 
     public List<Session> getActiveSessionsByPage(String href) {
+        if (!href.endsWith("/")) {
+            href += "/";
+        }
+        final String correctHref = href;
         return this.sessions.values().stream()
                 .filter(session -> session.getWebSocket().isOpen() && session.getPage() != null
-                        && session.getPage().getPath().equals(href))
+                        && session.getPage().getPath().equals(correctHref))
                 .collect(Collectors.toList());
     }
 }

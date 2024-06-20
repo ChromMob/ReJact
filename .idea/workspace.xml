@@ -4,16 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Merging">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Remove useless stuff because open sourcing">
+      <change afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/NavTag.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/calendar/CalendarPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/KasperPage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/AdminComponent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/LoginComponent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/products/DayJson.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/products/ProductComponent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/kasper/components/products/ProductType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/Page.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/Page.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/WebPageBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/WebPageBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/css/CSSBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/css/CSSBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/test/TestPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/test/TestPage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,8 +52,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -84,6 +83,11 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="me.chrommob.calendar" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="ReJact [shadowJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
@@ -146,12 +150,39 @@
       <option name="project" value="LOCAL" />
       <updated>1718527775872</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Remove useless kasper test">
+      <option name="closed" value="true" />
+      <created>1718831776016</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1718831776016</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Update script.js">
+      <option name="closed" value="true" />
+      <created>1718831846422</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1718831846422</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Remove useless stuff because open sourcing">
+      <option name="closed" value="true" />
+      <created>1718831938610</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1718831938610</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add intellij files here" />
     <MESSAGE value="Merging" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merging" />
+    <MESSAGE value="Remove useless kasper test" />
+    <MESSAGE value="Update script.js" />
+    <MESSAGE value="Remove useless stuff because open sourcing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove useless stuff because open sourcing" />
   </component>
 </project>

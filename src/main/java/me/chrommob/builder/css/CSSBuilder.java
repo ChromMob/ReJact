@@ -6,15 +6,17 @@ import java.util.Map;
 public class CSSBuilder {
     private final Map<String, Map<String, String>> styles = new HashMap<>();
 
-    public void addClass(String className, String property, String value) {
+    public CSSBuilder addClass(String className, String property, String value) {
         className = "." + className;
         Map<String, String> style = styles.computeIfAbsent(className, k -> new HashMap<>());
         style.put(property, value);
+        return this;
     }
 
-    public void addClass(String className, Map<String, String> style) {
+    public CSSBuilder addClass(String className, Map<String, String> style) {
         className = "." + className;
         styles.put(className, style);
+        return this;
     }
 
     public String build() {
@@ -30,5 +32,17 @@ public class CSSBuilder {
             builder.append(System.lineSeparator());
         }
         return builder.toString();
+    }
+
+    public boolean hasClass(String className) {
+        return styles.containsKey(className);
+    }
+
+    public CSSBuilder clone() {
+        CSSBuilder builder = new CSSBuilder();
+        for (Map.Entry<String, Map<String, String>> entry : styles.entrySet()) {
+            builder.addClass(entry.getKey(), entry.getValue());
+        }
+        return builder;
     }
 }

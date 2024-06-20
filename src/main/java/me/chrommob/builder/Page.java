@@ -39,6 +39,7 @@ public class Page {
     }
     
     private final Tag root = new RootHtmlTag();
+    private final CSSBuilder rootCssBuilder = new CSSBuilder();
     private CSSBuilder cssBuilder;
 
     private String cssString;
@@ -46,7 +47,7 @@ public class Page {
     private boolean hasDynamicDataHandlers;
 
     public void build() {
-        cssBuilder = new CSSBuilder();
+        cssBuilder = rootCssBuilder.clone();
 
         localEventMap.clear();
         localFileEventMap.clear();
@@ -138,6 +139,7 @@ public class Page {
 
     private String buildCss(List<Tag> tags) {
         Set<String> classNames = new HashSet<>();
+        cssBuilder.addClass("hidden", "display", "none");
         for (Tag tag : tags) {
             boolean ownClassName = false;
             String usedClassName;
@@ -147,10 +149,10 @@ public class Page {
             } else {
                 Iterator<String> iterator = classNames1.iterator();
                 String candidate = iterator.next();
-                while ((classNames.contains(candidate) || candidate.equals("hidden")) && iterator.hasNext()) {
+                while ((classNames.contains(candidate) || cssBuilder.hasClass(candidate)) && iterator.hasNext()) {
                     candidate = iterator.next();
                 }
-                if (candidate == null || classNames.contains(candidate) || candidate.equals("hidden")) {
+                if (candidate == null || classNames.contains(candidate) || cssBuilder.hasClass(candidate)) {
                     usedClassName = Internal.generateRandomString(20);
                 } else {
                     usedClassName = candidate;
@@ -171,12 +173,15 @@ public class Page {
             }
         }
 
-        cssBuilder.addClass("hidden", "display", "none");
         return cssBuilder.build();
     }
 
     public Tag root() {
         return root;
+    }
+
+    public CSSBuilder cssBuilder() {
+        return rootCssBuilder;
     }
 
     public String getPath() {
