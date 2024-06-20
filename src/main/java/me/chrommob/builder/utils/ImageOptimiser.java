@@ -22,6 +22,14 @@ import io.javalin.Javalin;
 import me.chrommob.builder.html.FileUtils;
 
 public class ImageOptimiser {
+    private static final List<ImageReader> imageReaders = new ArrayList<>();
+    static {
+            imageReaders.add(new PngReader());
+            imageReaders.add(new ImageIOReader());
+            imageReaders.add(new OpenGifReader());
+            imageReaders.add(new WebpImageReader());
+    }
+
     private final Javalin app;
 
     public ImageOptimiser(Javalin app) {
@@ -36,9 +44,57 @@ public class ImageOptimiser {
                 path = path.substring("/_rejact/images/".length());
             }
             File file = new File(internalPath, path);
-            ctx.contentType("image/png");
+            ctx.contentType("image/webp");
             byte[] bytes = FileUtils.readFileToBytes(file);
-            ctx.result(bytes);
+            if (bytes == null) {
+                ctx.status(404);
+                return;
+            }
+            String args = ctx.queryString();
+            int q = 100;
+            int w = -1;
+            if (args != null) {
+                String[] data = args.split("&");
+                for (String arg : data) {
+                    String[] keyValue = arg.split("=");
+                    if (keyValue.length != 2) {
+                        continue;
+                    }
+                    String key = keyValue[0];
+                    String value = keyValue[1];
+                    if (key.equals("q")) {
+                        try {
+                            q = Integer.parseInt(value);
+                        } catch (NumberFormatException e) {
+                            q = 100;
+                        }
+                    } else if (key.equals("w")) {
+                        try {
+                            w = Integer.parseInt(value);
+                        } catch (NumberFormatException e) {
+                            w = -1;
+                        }
+                    }
+                }
+            }
+            if (w == -1 && q == 100) {
+                ctx.result(bytes).header("Cache-Control", "public, max-age=31536000");
+                return;
+            }
+            ImmutableImage image = ImmutableImage.loader().withImageReaders(List.of(new WebpImageReader())).fromBytes(bytes);
+            if (w != -1) {
+                if (w < image.width && w > 0) {
+                    image.resizeToWidth(w);
+                }
+            }
+            if (q < 0) {
+                q = 0;
+            }
+            if (q > 100) {
+                q = 100;
+            }
+            bytes = image.bytes(WebpWriter.DEFAULT.withQ(q).withMultiThread());
+            ctx.result(bytes).header("Cache-Control", "public, max-age=31536000");
         });
     }
 
@@ -59,17 +115,12 @@ public class ImageOptimiser {
         }
 
         try {
-            List<ImageReader> imageReaders = new ArrayList<>();
-            imageReaders.add(new PngReader());
-            imageReaders.add(new ImageIOReader());
-            imageReaders.add(new OpenGifReader());
-            imageReaders.add(new WebpImageReader());
             if (isGif) {
                 AnimatedGif animatedGif = AnimatedGifReader.read(ImageSource.of(imageData));
                 animatedGif.output(Gif2WebpWriter.DEFAULT, out);
             } else {
                 ImmutableImage image = ImmutableImage.loader().withImageReaders(imageReaders).fromBytes(imageData);
-                image.output(WebpWriter.DEFAULT, out);
+                image.output(WebpWriter.DEFAULT.withMultiThread(), out);
             }
         } catch (IOException e) {
             e.printStackTrace();
