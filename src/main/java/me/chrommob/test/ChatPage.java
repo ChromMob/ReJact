@@ -1,7 +1,6 @@
 package me.chrommob.test;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -39,11 +38,11 @@ import me.chrommob.builder.socket.Session;
 import me.chrommob.builder.utils.ImageOptimiser;
 import me.chrommob.builder.utils.Internal;
 
-public class TestPage {
+public class ChatPage {
     private final WebPageBuilder builder;
     public static final List<Message> messages = new ArrayList<>();
 
-    public TestPage(WebPageBuilder builder) {
+    public ChatPage(WebPageBuilder builder) {
         this.builder = builder;
         build();
     }
@@ -52,9 +51,9 @@ public class TestPage {
     }
 
     private void build() {
-        Page homePage = builder.newPage("/chat/");
+        Page homePage = builder.newPage("/");
         homePage.root().addChild(new HtmlTag().addAttribute(LANG, "en")
-                .addChild(new HeadTag().addChild(new TitleTag().plainText("ReJact"))
+                .addChild(new HeadTag().addChild(new TitleTag().plainText("Chat Demo"))
                         .addChild(new MetaTag().addAttribute(CHARSET, "utf-8"))
                         .addChild(new MetaTag().addAttribute(NAME, "viewport").addAttribute(CONTENT,
                                 "width=device-width, initial-scale=1")))
@@ -77,7 +76,7 @@ public class TestPage {
             if (username == null) {
                 return;
             }
-            session.redirect("/chat/");
+            session.redirect("/");
         })
                 .addAttribute(LANG, "en")
                 .addChild(new HeadTag().addChild(new TitleTag().plainText("Login"))
@@ -93,7 +92,7 @@ public class TestPage {
                                         .event(EventTypes.CLICK, (session, htmlElement) -> session
                                                 .getHtmlElement("username", htmlElement1 -> {
                                                     session.setCookie("username", htmlElement1.value());
-                                                    session.redirect("/chat/");
+                                                    session.redirect("/");
                                                 }))))));
 //        homePage.build();
         loginPage.build();
@@ -107,7 +106,7 @@ public class TestPage {
         }
         Tag sessionList = new ULTag().css("default", "display", "grid").css("grid-template-columns", "1fr 1fr")
                 .css("grid-gap", "10px");
-        for (Session sessions : builder.getActiveSessionsByPage("/chat/")) {
+        for (Session sessions : builder.getActiveSessionsByPage("/")) {
             if (ignoreCurrentUser && sourceSession == sessions) {
                 continue;
             }
@@ -116,7 +115,7 @@ public class TestPage {
             }
             sessionList.addChild(new ParagraphTag().plainText(sessions.getCookie("username")));
         }
-        for (Session sessions : builder.getActiveSessionsByPage("/chat/")) {
+        for (Session sessions : builder.getActiveSessionsByPage("/")) {
             sessions.getHtmlElement("users", users -> {
                 sessions.setInnerHtml(users, sessionList);
             });
@@ -135,11 +134,11 @@ public class TestPage {
                     .css("background-color", "#eee")
                     .css("overflow-x", "hidden").css("padding", "10px");
             messages.addDynamicDataHandler(v -> {
-                for (int i = 0; i < TestPage.messages.size(); i++) {
-                    Message message = TestPage.messages.get(i);
-                    Tag messageTag = new TestPage.MessageTag(message.username(), message.message(),
+                for (int i = 0; i < ChatPage.messages.size(); i++) {
+                    Message message = ChatPage.messages.get(i);
+                    Tag messageTag = new ChatPage.MessageTag(message.username(), message.message(),
                             message.imageData());
-                    boolean isLastMessage = i == TestPage.messages.size() - 1;
+                    boolean isLastMessage = i == ChatPage.messages.size() - 1;
                     if (isLastMessage) {
                         messageTag.addAttribute(GlobalAttributes.ID, "lastMessage");
                     }
@@ -183,7 +182,7 @@ public class TestPage {
         }
 
         private void chat(Session sourceSession) {
-            if (webPageBuilder.getActiveSessionsByPage("/chat/") == null) {
+            if (webPageBuilder.getActiveSessionsByPage("/") == null) {
                 return;
             }
             sourceSession.getFileInfo("file", fileData -> {
@@ -223,9 +222,9 @@ public class TestPage {
                         image.addAttribute(SRC, link);
                     }
 
-                    TestPage.messages.add(new TestPage.Message(username, messageValue, link));
+                    ChatPage.messages.add(new ChatPage.Message(username, messageValue, link));
 
-                    for (Session session : webPageBuilder.getActiveSessionsByPage("/chat/")) {
+                    for (Session session : webPageBuilder.getActiveSessionsByPage("/")) {
                         session.getHtmlElement("messages", messages -> {
                             session.hasLastChild(messages, exists -> {
                                 if (exists.value().equals("true")) {
@@ -247,7 +246,11 @@ public class TestPage {
         public Header() {
             super();
             css("background-color", "#333").css("overflow", "hidden").css("display", "flex").css("align-items", "start")
-                    .addChild(new HeaderButton(true, "/chat/", "ReJact"))
+                    .addChild(new HeaderButton(true, "/", "Chat Demo"))
+                    .addChild(new HeaderButton(false, "/demo/", "Demo")
+                            .event(EventTypes.CLICK, (session, htmlElement) -> {
+                                session.redirect("/demo");
+                            }))
                     .addChild(new HeaderButton(false, "/login", "Logout")
                             .event(EventTypes.CLICK, (session, htmlElement) -> session.clearCookies()));
         }
@@ -283,7 +286,7 @@ public class TestPage {
                                     return;
                                 }
                                 session.setCookie("username", key.value());
-                                session.redirect("/chat/");
+                                session.redirect("/");
                             })));
         }
     }

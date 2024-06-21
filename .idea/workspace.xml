@@ -4,15 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Add ability to optimise images on the fly">
+    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Add draggable example page to show that it can work great even with full SSR">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/Page.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/Page.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/constants/GlobalAttributes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/constants/GlobalAttributes.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/events/EventTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/events/EventTypes.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/ImageTag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/ImageTag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/Tag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/Tag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/calendar/CalendarPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/calendar/CalendarPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/calendar/DraggableExamplePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/calendar/DraggableExamplePage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/test/TestPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/test/ChatPage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -207,7 +203,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718908039650</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Add draggable example page to show that it can work great even with full SSR">
+      <option name="closed" value="true" />
+      <created>1718951299743</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1718951299743</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -220,6 +224,7 @@
     <MESSAGE value="Make ImageOptimer#optimise() return a CompletableFuture&lt;String&gt; so we can keep doing stuff in the background" />
     <MESSAGE value="Cache HTML for faster render times when using dynamic content." />
     <MESSAGE value="Add ability to optimise images on the fly" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add ability to optimise images on the fly" />
+    <MESSAGE value="Add draggable example page to show that it can work great even with full SSR" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add draggable example page to show that it can work great even with full SSR" />
   </component>
 </project>

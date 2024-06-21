@@ -19,20 +19,14 @@ public class DraggableExamplePage {
     }
 
     private void build() {
-        Page homePage = builder.newPage("/");
+        Page homePage = builder.newPage("/demo");
 
 
         homePage.cssBuilder().addClass("active", "border", "1px solid white");
 
-        homePage.root().addChild(new HtmlTag().event(EventTypes.BEFORELOAD, (session, htmlElement) -> {
-                    String username = session.getCookie("username_calendar");
-                    if (username != null) {
-                        return;
-                    }
-                    //session.redirect("/chat/");
-                })
+        homePage.root().addChild(new HtmlTag()
                 .addAttribute(LANG, "en")
-                .addChild(new HeadTag().addChild(new TitleTag().plainText("Calendar"))
+                .addChild(new HeadTag().addChild(new TitleTag().plainText("Draggable Demo"))
                         .addChild(new MetaTag().addAttribute(CHARSET, "utf-8"))
                         .addChild(new MetaTag().addAttribute(NAME, "viewport").addAttribute(CONTENT,
                                 "width=device-width, initial-scale=1")))
