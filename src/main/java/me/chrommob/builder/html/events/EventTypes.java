@@ -11,7 +11,10 @@ public enum EventTypes {
     KEYDOWN(EventBuilders.perElementWithEventValue, "key"),
     TENSECONDTIMER(EventBuilders.timer, "10000"),
     SECONDTIMER(EventBuilders.timer, "1000"),
-    CHANGE(EventBuilders.getFile, null);
+    CHANGE(EventBuilders.getFile, null),
+    DROP(EventBuilders.perElement, true),
+    DRAGOVER(EventBuilders.perElement, true),
+    DRAGSTART(EventBuilders.perElement, false);
 
     private final EventBuilders.EventBuilder eventBuilders;
     private final Object extraData;

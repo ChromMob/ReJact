@@ -35,6 +35,7 @@ public class Tag {
     private String plainText;
     private final Map<EventTypes, BiConsumer<Session, HtmlElement>> events = new HashMap<>();
     private final Map<EventTypes, TriConsumer<Session, FileProgress, File>> fileEvents = new HashMap<>();
+    private final Set<EventTypes> preventDefaults = new HashSet<>();
 
     public boolean hasDynamicDataHandlers() {
         return !dynamicDataHandlers.isEmpty();
@@ -242,6 +243,11 @@ public class Tag {
         return this;
     }
 
+    public Tag preventDefault(EventTypes eventTypes) {
+        preventDefaults.add(eventTypes);
+        return this;
+    }
+
     public Tag fileEvent(EventTypes eventTypes, TriConsumer<Session, FileProgress, File> htmlElementConsumer) {
         fileEvents.put(eventTypes, htmlElementConsumer);
         return this;
@@ -253,6 +259,10 @@ public class Tag {
 
     public Map<EventTypes, TriConsumer<Session, FileProgress, File>> getFileEvents() {
         return new HashMap<>(fileEvents);
+    }
+
+    public Set<EventTypes> getPreventDefaults() {
+        return new HashSet<>(preventDefaults);
     }
 
     public String id() {
@@ -294,6 +304,7 @@ public class Tag {
         getAllChildren().forEach(tag -> allFileEvents.put(tag, tag.getFileEvents()));
         return allFileEvents;
     }
+
 
     public Tag addDynamicDataHandler(Consumer<Void> handler) {
         dynamicDataHandlers.add(handler);

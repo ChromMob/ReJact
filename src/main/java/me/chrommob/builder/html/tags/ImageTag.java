@@ -2,6 +2,8 @@ package me.chrommob.builder.html.tags;
 
 import static me.chrommob.builder.html.constants.GlobalAttributes.SRC;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -28,9 +30,14 @@ public class ImageTag extends Tag {
     }
 
     public CompletableFuture<ReturnedImage> setImage(String httpUrl) {
-        try (InputStream inputStream = new URL(httpUrl).openStream()) {
-            byte[] bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
+        try (InputStream inputStream = new BufferedInputStream(new URL(httpUrl).openStream())) {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, length);
+            }
+            byte[] bytes = outputStream.toByteArray();
             boolean isWebp = httpUrl.endsWith(".webp");
             boolean isGif = httpUrl.endsWith(".gif");
             return setImage(bytes, isGif, isWebp);

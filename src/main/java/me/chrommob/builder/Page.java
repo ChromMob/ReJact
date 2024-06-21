@@ -26,6 +26,7 @@ public class Page {
     private final int clientPort;
     private final Map<EventTypes, Set<Tag>> eventMap;
     private final Map<EventTypes, Set<Tag>> fileEventMap;
+    private final Map<EventTypes, Set<Tag>> localPreventDefaults = new HashMap<>();
     private final Map<EventTypes, Set<Tag>> localEventMap = new HashMap<>();
     private final Map<EventTypes, Set<Tag>> localFileEventMap = new HashMap<>();
 
@@ -51,6 +52,7 @@ public class Page {
 
         localEventMap.clear();
         localFileEventMap.clear();
+        localPreventDefaults.clear();
 
         List<Tag> tags = root.getAllChildren();
 
@@ -84,6 +86,9 @@ public class Page {
                 Set<Tag> localList = localFileEventMap.computeIfAbsent(entry.getKey(), k -> new HashSet<>());
                 list.add(tag);
                 localList.add(tag);
+            }
+            for (EventTypes eventTypes : tag.getPreventDefaults()) {
+                localPreventDefaults.computeIfAbsent(eventTypes, k -> new HashSet<>()).add(tag);
             }
         }
         root.removeChildByClass(ScriptTag.class);
@@ -133,6 +138,17 @@ public class Page {
             String idsString = ids.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(","));
             builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString).append("];\n");
             builder.append(eventTypes.build());
+        }
+        for (EventTypes eventTypes : localPreventDefaults.keySet()) {
+            Set<Tag> list = localPreventDefaults.get(eventTypes);
+            List<String> ids = list.stream().map(Tag::id).toList();
+            String idsString = ids.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(","));
+            builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString).append("];\n");
+            builder.append("for (var i = 0; i < ").append(eventTypes.name().toLowerCase()).append(".length; i++) {\n");
+            builder.append("document.getElementById(").append(eventTypes.name().toLowerCase()).append("[i]).addEventListener('").append(eventTypes.name().toLowerCase()).append("', function (event) {\n");
+            builder.append("event.preventDefault();\n");
+            builder.append("});\n");
+            builder.append("}\n");
         }
         return builder.toString();
     }
