@@ -1,17 +1,31 @@
 package me.chrommob.builder.html;
 
-import java.io.BufferedReader;
+import me.chrommob.builder.utils.Internal;
+
+import java.io.*;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
 
 public class FileUtils {
     public static String readFileToString(File file) {
         StringBuilder sb = new StringBuilder();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    public static String readResourceToString(String resource) {
+        StringBuilder sb = new StringBuilder();
+        try (InputStream inputStream = Internal.class.getResourceAsStream(resource)) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line);

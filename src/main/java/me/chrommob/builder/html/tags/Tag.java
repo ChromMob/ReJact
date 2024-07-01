@@ -35,7 +35,7 @@ public class Tag {
     private String plainText;
     private final Map<EventTypes, BiConsumer<Session, HtmlElement>> events = new HashMap<>();
     private final Map<EventTypes, TriConsumer<Session, FileProgress, File>> fileEvents = new HashMap<>();
-    private final Set<EventTypes> preventDefaults = new HashSet<>();
+    private final Set<EventTypes> noCallback = new HashSet<>();
 
     public boolean hasDynamicDataHandlers() {
         return !dynamicDataHandlers.isEmpty();
@@ -243,8 +243,8 @@ public class Tag {
         return this;
     }
 
-    public Tag preventDefault(EventTypes eventTypes) {
-        preventDefaults.add(eventTypes);
+    public Tag noCallback(EventTypes eventTypes) {
+        noCallback.add(eventTypes);
         return this;
     }
 
@@ -261,8 +261,8 @@ public class Tag {
         return new HashMap<>(fileEvents);
     }
 
-    public Set<EventTypes> getPreventDefaults() {
-        return new HashSet<>(preventDefaults);
+    public Set<EventTypes> getNoCallback() {
+        return new HashSet<>(noCallback);
     }
 
     public String id() {

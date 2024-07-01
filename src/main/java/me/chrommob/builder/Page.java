@@ -12,7 +12,6 @@ import me.chrommob.builder.utils.Internal;
 
 import org.apache.commons.lang3.function.TriConsumer;
 
-import java.io.File;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -20,7 +19,8 @@ import java.util.stream.Collectors;
 import static me.chrommob.builder.html.constants.GlobalAttributes.HREF;
 
 public class Page {
-    private final Configuration configuration = new Configuration.Builder().setMinifyJs(true).setMinifyCss(true).build();
+    private final Configuration configuration = new Configuration.Builder().setMinifyJs(true).setMinifyCss(true)
+            .build();
     private final String path;
     private final String ip;
     private final int clientPort;
@@ -38,7 +38,7 @@ public class Page {
         this.eventMap = eventMap;
         this.fileEventMap = fileEventMap;
     }
-    
+
     private final Tag root = new RootHtmlTag();
     private final CSSBuilder rootCssBuilder = new CSSBuilder();
     private CSSBuilder cssBuilder;
@@ -87,7 +87,7 @@ public class Page {
                 list.add(tag);
                 localList.add(tag);
             }
-            for (EventTypes eventTypes : tag.getPreventDefaults()) {
+            for (EventTypes eventTypes : tag.getNoCallback()) {
                 localPreventDefaults.computeIfAbsent(eventTypes, k -> new HashSet<>()).add(tag);
             }
         }
@@ -111,7 +111,7 @@ public class Page {
         if (baseTags.isEmpty()) {
             headTag.addChild(new BaseTag().addAttribute(HREF, path));
         } else {
-            //Find if any has href attribute
+            // Find if any has href attribute
             Tag baseTag = baseTags.stream().filter(tag -> tag.getAttributes().get(HREF) != null).findFirst()
                     .orElse(null);
             if (baseTag == null) {
@@ -129,23 +129,28 @@ public class Page {
             Set<Tag> list = localEventMap.get(eventTypes);
             List<String> ids = list.stream().map(Tag::id).toList();
             String idsString = ids.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(","));
-            builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString).append("];\n");
+            builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString)
+                    .append("];\n");
             builder.append(eventTypes.build());
         }
         for (EventTypes eventTypes : localFileEventMap.keySet()) {
             Set<Tag> list = localFileEventMap.get(eventTypes);
             List<String> ids = list.stream().map(Tag::id).toList();
             String idsString = ids.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(","));
-            builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString).append("];\n");
+            builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString)
+                    .append("];\n");
             builder.append(eventTypes.build());
         }
         for (EventTypes eventTypes : localPreventDefaults.keySet()) {
             Set<Tag> list = localPreventDefaults.get(eventTypes);
             List<String> ids = list.stream().map(Tag::id).toList();
             String idsString = ids.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(","));
-            builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString).append("];\n");
+            builder.append("var ").append(eventTypes.name().toLowerCase()).append(" = [").append(idsString)
+                    .append("];\n");
             builder.append("for (var i = 0; i < ").append(eventTypes.name().toLowerCase()).append(".length; i++) {\n");
-            builder.append("document.getElementById(").append(eventTypes.name().toLowerCase()).append("[i]).addEventListener('").append(eventTypes.name().toLowerCase()).append("', function (event) {\n");
+            builder.append("document.getElementById(").append(eventTypes.name().toLowerCase())
+                    .append("[i]).addEventListener('").append(eventTypes.name().toLowerCase())
+                    .append("', function (event) {\n");
             builder.append("event.preventDefault();\n");
             builder.append("});\n");
             builder.append("}\n");
@@ -217,7 +222,7 @@ public class Page {
     public class ScriptTag extends Tag {
         public ScriptTag(String append) {
             super("script", true, true);
-            String script = FileUtils.readFileToString(new File("script.js"));
+            String script = FileUtils.readResourceToString("/script.js");
             script = script.replace("your-server-url", ip).replace("your-server-port", String.valueOf(clientPort));
             script = script + append;
             plainText(script);
