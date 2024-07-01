@@ -14,7 +14,6 @@ public class Main {
         WebPageBuilder builder = new WebPageBuilder("wss.chrommob.fun", 9090, port, port);
         new DraggableExamplePage(builder);
         new ChatPage(builder);
+        builder.start();
     }
 }
-
-

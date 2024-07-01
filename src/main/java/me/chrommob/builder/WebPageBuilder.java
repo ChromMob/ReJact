@@ -42,6 +42,7 @@ public class WebPageBuilder {
     private final String ip;
     private final int clientPort;
     private final Javalin app;
+    private final WebSocketImpl webSocket;
     private final Map<String, WebSocket> webSockets = new ConcurrentHashMap<>();
     private final Map<WebSocket, Session> sessions = new ConcurrentHashMap<>();
     private final Map<EventTypes, Set<Tag>> eventMap = new HashMap<>();
@@ -52,7 +53,7 @@ public class WebPageBuilder {
         this.ip = ip;
         this.clientPort = clientPort;
 
-        WebSocketImpl webSocket = new WebSocketImpl(serverPort, this);
+        webSocket = new WebSocketImpl(serverPort, this);
 
         SSLContext context = getContext();
 
@@ -61,8 +62,6 @@ public class WebPageBuilder {
         }
 
         webSocket.setConnectionLostTimeout(30);
-
-        webSocket.start();
 
         app = Javalin.create().start(webPort);
         try (FileInputStream fis = new FileInputStream("favicon.ico")) {
@@ -111,6 +110,10 @@ public class WebPageBuilder {
                 }
             }
         }).start();
+    }
+
+    public void start() {
+        webSocket.start();
     }
 
     private static SSLContext getContext() {
