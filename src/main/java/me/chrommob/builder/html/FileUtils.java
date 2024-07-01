@@ -49,6 +49,17 @@ public class FileUtils {
         return null;
     }
 
+    public static byte[] readResourceToBytes(String resource) {
+        try (InputStream inputStream = Internal.class.getResourceAsStream(resource)) {
+            byte[] bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+            return bytes;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void writeFile(File file, byte[] bytes) {
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             outputStream.write(bytes);
