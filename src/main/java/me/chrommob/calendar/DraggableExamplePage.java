@@ -56,8 +56,10 @@ public class DraggableExamplePage {
                                     session.removeElementById(draggedId);
                                     session.addChild(drop, dragged.outerHtml());
                                 });
-                            }).addAttribute(ID, "droppable1")
-                            .preventDefault(EventTypes.DRAGOVER)
+                            })
+
+                    .addAttribute(ID, "droppable1")
+                            .noCallback(EventTypes.DRAGOVER)
             );
             addChild(new DivTag().css("width", "33%").css("height", "100%").css("align-content", "center")
                     .css("padding", "10px").css("border", "1px solid white")
@@ -70,8 +72,9 @@ public class DraggableExamplePage {
                                     session.removeElementById(draggedId);
                                     session.addChild(drop, dragged.outerHtml());
                                 });
-                            }).addAttribute(ID, "droppable2")
-                            .preventDefault(EventTypes.DRAGOVER)
+                            })
+                    .addAttribute(ID, "droppable2")
+                            .noCallback(EventTypes.DRAGOVER)
             );
             addChild(new DivTag().css("width", "33%").css("height", "100%").css("align-content", "center")
                     .css("position", "relative")
@@ -85,14 +88,18 @@ public class DraggableExamplePage {
                             session.removeElementById(draggedId);
                             session.addChild(drop, dragged.outerHtml());
                         });
-                    }).addAttribute(ID, "droppable3")
-                    .preventDefault(EventTypes.DRAGOVER)
+                    })
+                    .addAttribute(ID, "droppable3")
+                    .noCallback(EventTypes.DRAGOVER)
                     .addChild(new ImageTag()
                             .setImage("https://img.youtube.com/vi/G7lZBKFFnls/maxresdefault.jpg").thenApply(ImageTag.ReturnedImage::tag)
                             .join()
                             .css("width", "100%")
                             .addAttribute(DRAGGABLE, "true")
                             .event(EventTypes.DRAGSTART, (session, drag) -> {
+                                session.setCookie("draggedId", drag.id());
+                            })
+                            .event(EventTypes.TOUCHSTART, (session, drag) -> {
                                 session.setCookie("draggedId", drag.id());
                             })
                     )

@@ -13,8 +13,10 @@ public enum EventTypes {
     SECONDTIMER(EventBuilders.timer, "1000"),
     CHANGE(EventBuilders.getFile, null),
     DROP(EventBuilders.perElement, true),
+    TOUCHEND(EventBuilders.perElement, true),
     DRAGOVER(EventBuilders.perElement, true),
-    DRAGSTART(EventBuilders.perElement, false);
+    DRAGSTART(EventBuilders.perElement, false),
+    TOUCHSTART(EventBuilders.perElement, false);
 
     private final EventBuilders.EventBuilder eventBuilders;
     private final Object extraData;
