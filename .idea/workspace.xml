@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Add helper to read resource to bytes">
+    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Fix image optimiser">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -52,6 +52,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -224,7 +227,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719863729461</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Fix image optimiser">
+      <option name="closed" value="true" />
+      <created>1719941008386</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1719941008386</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -240,6 +251,7 @@
     <MESSAGE value="Add draggable example page to show that it can work great even with full SSR" />
     <MESSAGE value="Change some paths so the app is better understood by the user" />
     <MESSAGE value="Add helper to read resource to bytes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add helper to read resource to bytes" />
+    <MESSAGE value="Fix image optimiser" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix image optimiser" />
   </component>
 </project>

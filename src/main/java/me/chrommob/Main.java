@@ -1,7 +1,7 @@
 package me.chrommob;
 
 import me.chrommob.builder.WebPageBuilder;
-import me.chrommob.calendar.DraggableExamplePage;
+import me.chrommob.demo.DraggableExamplePage;
 import me.chrommob.test.ChatPage;
 
 public class Main {

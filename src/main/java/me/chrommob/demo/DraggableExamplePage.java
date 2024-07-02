@@ -1,4 +1,4 @@
-package me.chrommob.calendar;
+package me.chrommob.demo;
 
 import me.chrommob.builder.Page;
 import me.chrommob.builder.WebPageBuilder;
