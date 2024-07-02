@@ -84,7 +84,7 @@ public class ImageOptimiser {
             ImmutableImage image = ImmutableImage.loader().withImageReaders(List.of(new WebpImageReader())).fromBytes(bytes);
             if (w != -1) {
                 if (w < image.width && w > 0) {
-                    image.resizeToWidth(w);
+                    image = image.scaleToWidth(w);
                 }
             }
             if (q < 0) {
