@@ -383,6 +383,12 @@ public class Session {
         sendMessage(js + "\n" + jsEvents);
     }
 
+    public void addChild(String id, Tag tag) {
+        String jsEvents = handleRuntimeEventAdd(tag);
+        String js = "document.getElementById('" + id + "').innerHTML += '" + tag.build(true) + "';";
+        sendMessage(js + "\n" + jsEvents);
+    }
+
     public void addChild(HtmlElement messages, String html) {
         String id = messages.id();
         String js = "document.getElementById('" + id + "').innerHTML += '" + html + "';";

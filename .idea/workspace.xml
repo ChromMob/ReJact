@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Change some paths so the app is better understood by the user">
+    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Add helper to read resource to bytes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -216,7 +216,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718955883866</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Add helper to read resource to bytes">
+      <option name="closed" value="true" />
+      <created>1719863729461</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1719863729461</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -231,6 +239,7 @@
     <MESSAGE value="Add ability to optimise images on the fly" />
     <MESSAGE value="Add draggable example page to show that it can work great even with full SSR" />
     <MESSAGE value="Change some paths so the app is better understood by the user" />
-    <option name="LAST_COMMIT_MESSAGE" value="Change some paths so the app is better understood by the user" />
+    <MESSAGE value="Add helper to read resource to bytes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add helper to read resource to bytes" />
   </component>
 </project>

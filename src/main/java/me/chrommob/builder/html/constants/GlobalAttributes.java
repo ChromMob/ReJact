@@ -12,6 +12,8 @@ public enum GlobalAttributes {
     TYPE,
     FOR,
     SRC,
+    PLACEHOLDER,
     WIDTH,
-    DRAGGABLE, HEIGHT
+    DRAGGABLE,
+    HEIGHT
 }
