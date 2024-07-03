@@ -3,8 +3,9 @@ package me.chrommob.builder.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.Map;
 
 import com.sksamuel.scrimage.ImmutableImage;
 import com.sksamuel.scrimage.nio.AnimatedGif;
@@ -22,6 +23,9 @@ import io.javalin.Javalin;
 import me.chrommob.builder.html.FileUtils;
 
 public class ImageOptimiser {
+    public record ImageSize(int width, int height) {
+    }
+    private static final Map<String, ImageSize> imageSizes = new HashMap<>();
     private static final List<ImageReader> imageReaders = new ArrayList<>();
     static {
             imageReaders.add(new PngReader());
@@ -84,6 +88,15 @@ public class ImageOptimiser {
             ImmutableImage image = ImmutableImage.loader().withImageReaders(List.of(new WebpImageReader())).fromBytes(bytes);
             if (w != -1) {
                 if (w < image.width && w > 0) {
+                    if (w < 10) {
+                        w = 10;
+                    }
+                    int h = (int) ((double) w / image.width * image.height);
+                    if (h < 10) {
+                        //adjust w so h is at least 3
+                        h = 10;
+                        w = (int) ((double) h / image.height * image.width);
+                    }
                     image = image.scaleToWidth(w);
                 }
             }
@@ -103,23 +116,20 @@ public class ImageOptimiser {
         internalPath.mkdirs();
     }
 
-    public static String optimise(byte[] imageData, boolean isGif, boolean isWebp) {
+    public static String generateInternalUrl(byte[] imageData, boolean isGif) {
         String name = Internal.generateRandomString(20);
 
 
         File out = new File(internalPath, name + ".webp");
 
-        if (isWebp) {
-            FileUtils.writeFile(out, imageData);
-            return "/_rejact/images/" + name + ".webp";
-        }
-
         try {
             if (isGif) {
                 AnimatedGif animatedGif = AnimatedGifReader.read(ImageSource.of(imageData));
+                imageSizes.put(name, new ImageSize(animatedGif.getDimensions().width, animatedGif.getDimensions().height));
                 animatedGif.output(Gif2WebpWriter.DEFAULT, out);
             } else {
                 ImmutableImage image = ImmutableImage.loader().withImageReaders(imageReaders).fromBytes(imageData);
+                imageSizes.put(name, new ImageSize(image.width, image.height));
                 image.output(WebpWriter.DEFAULT.withMultiThread(), out);
             }
         } catch (IOException e) {
@@ -127,5 +137,9 @@ public class ImageOptimiser {
         }
 
         return "/_rejact/images/" + name + ".webp";
+    }
+
+    public static ImageSize getImageSize(String name) {
+        return imageSizes.get(name);
     }
 }

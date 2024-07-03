@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Fix image optimiser">
+    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Rename the package of the DraggableExamplePage to me.chrommob.demo so it makes sense.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/constants/GlobalAttributes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/constants/GlobalAttributes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/ImageTag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/ImageTag.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -235,7 +237,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719941008386</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Rename the package of the DraggableExamplePage to me.chrommob.demo so it makes sense.">
+      <option name="closed" value="true" />
+      <created>1719942644794</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1719942644794</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -252,6 +262,7 @@
     <MESSAGE value="Change some paths so the app is better understood by the user" />
     <MESSAGE value="Add helper to read resource to bytes" />
     <MESSAGE value="Fix image optimiser" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix image optimiser" />
+    <MESSAGE value="Rename the package of the DraggableExamplePage to me.chrommob.demo so it makes sense." />
+    <option name="LAST_COMMIT_MESSAGE" value="Rename the package of the DraggableExamplePage to me.chrommob.demo so it makes sense." />
   </component>
 </project>

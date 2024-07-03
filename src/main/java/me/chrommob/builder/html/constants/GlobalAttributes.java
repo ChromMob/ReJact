@@ -12,6 +12,7 @@ public enum GlobalAttributes {
     TYPE,
     FOR,
     SRC,
+    SRCSET,
     PLACEHOLDER,
     WIDTH,
     DRAGGABLE,

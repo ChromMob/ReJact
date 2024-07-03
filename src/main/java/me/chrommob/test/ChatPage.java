@@ -14,7 +14,6 @@ import static me.chrommob.builder.html.constants.GlobalAttributes.HREF;
 import static me.chrommob.builder.html.constants.GlobalAttributes.ID;
 import static me.chrommob.builder.html.constants.GlobalAttributes.LANG;
 import static me.chrommob.builder.html.constants.GlobalAttributes.NAME;
-import static me.chrommob.builder.html.constants.GlobalAttributes.SRC;
 import static me.chrommob.builder.html.constants.GlobalAttributes.TYPE;
 import me.chrommob.builder.html.constants.HeadingLevel;
 import me.chrommob.builder.html.events.EventTypes;
@@ -197,16 +196,16 @@ public class ChatPage {
                         }
                         sourceSession.hide("progressName");
                         sourceSession.hide("progress");
-                        postMessage(sourceSession, callBackFile.data(), fileData.type().contains("gif"), fileData.type().contains("webp"));
+                        postMessage(sourceSession, callBackFile.data(), fileData.type().contains("gif"));
                         sourceSession.clearValue("file");
                     });
                     return;
                 }
-                postMessage(sourceSession, null, false, false);
+                postMessage(sourceSession, null, false);
             });
         }
 
-        private void postMessage(Session sourceSession, byte[] imageData, boolean isGif, boolean isWebp) {
+        private void postMessage(Session sourceSession, byte[] imageData, boolean isGif) {
             sourceSession.getHtmlElement("message", message -> {
                 String messageValue = message.value();
                 sourceSession.setValue("message", "");
@@ -214,12 +213,12 @@ public class ChatPage {
                 if (username == null) {
                     return;
                 }
-                MessageTag messageTag = new MessageTag(username, messageValue, imageData, isGif, isWebp);
+                MessageTag messageTag = new MessageTag(username, messageValue, imageData, isGif);
                 messageTag.getImageLink().thenAccept(link -> {
                     if (link != null) {
-                        Tag image = messageTag.getChildrenByClass(ImageTag.class).stream().findFirst().orElse(null);
+                        ImageTag image = (ImageTag) messageTag.getChildrenByClass(ImageTag.class).stream().findFirst().orElse(null);
                         assert image != null;
-                        image.addAttribute(SRC, link);
+                        image.setInternalImageUrl(link);
                     }
 
                     ChatPage.messages.add(new ChatPage.Message(username, messageValue, link));
@@ -293,14 +292,14 @@ public class ChatPage {
 
     public static class MessageTag extends DivTag {
         private CompletableFuture<String> imageLink;
-        public MessageTag(String username, String message, byte[] imageData, boolean isGif, boolean isWebp) {
+        public MessageTag(String username, String message, byte[] imageData, boolean isGif) {
             super();
             addChild(new BoldTag().plainText(username + ": "));
             addChild(new ParagraphTag().plainText(message));
             if (imageData != null) {
                 ImageTag image = new ImageTag();
                 addChild(image);
-                imageLink = CompletableFuture.supplyAsync(() -> ImageOptimiser.optimise(imageData, isGif, isWebp));
+                imageLink = CompletableFuture.supplyAsync(() -> ImageOptimiser.generateInternalUrl(imageData, isGif));
             }
         }
 
@@ -316,7 +315,7 @@ public class ChatPage {
             addChild(new BoldTag().plainText(username + ": "));
             addChild(new ParagraphTag().plainText(message));
             if (imageLink != null) {
-                addChild(new ImageTag().addAttribute(SRC, imageLink));
+                addChild(new ImageTag().setInternalImageUrl(imageLink));
             }
         }
     }

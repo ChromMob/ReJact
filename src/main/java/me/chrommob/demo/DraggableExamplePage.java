@@ -92,7 +92,7 @@ public class DraggableExamplePage {
                     .addAttribute(ID, "droppable3")
                     .noCallback(EventTypes.DRAGOVER)
                     .addChild(new ImageTag()
-                            .setImage("https://img.youtube.com/vi/G7lZBKFFnls/maxresdefault.jpg").thenApply(ImageTag.ReturnedImage::tag)
+                            .setImage("https://img.youtube.com/vi/G7lZBKFFnls/maxresdefault.jpg")
                             .join()
                             .css("width", "100%")
                             .addAttribute(DRAGGABLE, "true")
