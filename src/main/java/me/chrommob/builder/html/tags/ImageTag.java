@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import me.chrommob.builder.utils.ImageOptimiser;
 
 public class ImageTag extends Tag {
-    private static final int[] widths = {320, 640, 960, 1280, 1600, 1920, 2560, 3200, 3840 };
+    private static final int[] widths = {320, 375, 414, 512, 640, 768, 800, 912, 1024, 1280, 1366, 1440, 1536, 1600, 1920, 2048, 2560, 3200, 3840 };
     public ImageTag() {
         super("img");
     }
