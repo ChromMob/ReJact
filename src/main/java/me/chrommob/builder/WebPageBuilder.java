@@ -49,16 +49,16 @@ public class WebPageBuilder {
     private final Map<EventTypes, Set<Tag>> fileEventMap = new HashMap<>();
     private final Map<String, Page> pages = new HashMap<>();
 
-    public WebPageBuilder(String ip, int webPort, int serverPort, int clientPort) {
+    public WebPageBuilder(String ip, int webPort, int serverPort, int clientPort, String certificatePath, String password) {
         this.ip = ip;
         this.clientPort = clientPort;
 
         webSocket = new WebSocketImpl(serverPort, this);
 
-        SSLContext context = getContext();
+        SSLContext context = getContext(certificatePath, password);
 
         if (context != null) {
-            webSocket.setWebSocketFactory(new DefaultSSLWebSocketServerFactory(getContext()));
+            webSocket.setWebSocketFactory(new DefaultSSLWebSocketServerFactory(getContext(certificatePath, password)));
         }
 
         webSocket.setConnectionLostTimeout(30);
@@ -116,17 +116,15 @@ public class WebPageBuilder {
         webSocket.start();
     }
 
-    private static SSLContext getContext() {
+    private static SSLContext getContext(String certificatePath, String password) {
         SSLContext context;
-        String password = "CHANGEIT";
-        String pathname = "/etc/letsencrypt/live/wss.chrommob.fun";
         try {
             context = SSLContext.getInstance("TLS");
 
-            byte[] certBytes = parseDERFromPEM(getBytes(new File(pathname + File.separator + "cert.pem")),
+            byte[] certBytes = parseDERFromPEM(getBytes(new File(certificatePath + File.separator + "cert.pem")),
                     "-----BEGIN CERTIFICATE-----", "-----END CERTIFICATE-----");
             byte[] keyBytes = parseDERFromPEM(
-                    getBytes(new File(pathname + File.separator + "privkey.pem")),
+                    getBytes(new File(certificatePath + File.separator + "privkey.pem")),
                     "-----BEGIN PRIVATE KEY-----", "-----END PRIVATE KEY-----");
 
             X509Certificate cert = generateCertificateFromDER(certBytes);

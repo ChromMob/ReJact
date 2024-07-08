@@ -9,6 +9,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     mavenLocal()
+    maven("https://jitpack.io")
 }
 
 //Set main class for fat jar
@@ -25,6 +26,7 @@ java {
 }
 
 dependencies {
+    implementation("com.github.ChromMob:ConfigManager:master-SNAPSHOT")
     implementation("com.sksamuel.scrimage:scrimage-core:4.1.2")
     implementation("com.sksamuel.scrimage:scrimage-webp:4.1.2")    
     implementation("org.apache.commons:commons-lang3:3.14.0")
