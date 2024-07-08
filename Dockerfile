@@ -11,7 +11,7 @@ COPY . .
 RUN ./gradlew shadowJar
 
 # Use a smaller base image for the final run stage with the latest Java version
-FROM openjdk:17-jre-slim
+FROM openjdk:17-jdk-slim
 
 # Set the working directory inside the container
 WORKDIR /app
