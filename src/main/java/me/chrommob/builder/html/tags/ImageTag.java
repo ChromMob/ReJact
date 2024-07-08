@@ -26,6 +26,7 @@ public class ImageTag extends Tag {
             if (imageData != null) {
                 link = ImageOptimiser.generateInternalUrl(imageData, isGif);
             }
+            assert link != null;
             return setInternalImageUrl(link);
         });
     }

@@ -15,6 +15,7 @@ import static me.chrommob.builder.html.constants.GlobalAttributes.ID;
 import static me.chrommob.builder.html.constants.GlobalAttributes.LANG;
 import static me.chrommob.builder.html.constants.GlobalAttributes.NAME;
 import static me.chrommob.builder.html.constants.GlobalAttributes.TYPE;
+
 import me.chrommob.builder.html.constants.HeadingLevel;
 import me.chrommob.builder.html.events.EventTypes;
 import me.chrommob.builder.html.tags.ATag;
@@ -38,6 +39,8 @@ import me.chrommob.builder.utils.ImageOptimiser;
 import me.chrommob.builder.utils.Internal;
 
 public class ChatPage {
+    private static final String CHAT_BACKGROUND_COLOR = "#f0f5f9";
+    private static final String MESSAGE_BACKGROUND_COLOR = "#ffffff";
     private final WebPageBuilder builder;
     public static final List<Message> messages = new ArrayList<>();
 
@@ -85,15 +88,19 @@ public class ChatPage {
                 .addChild(new BodyTag()
                         .css("font-family", "Arial, sans-serif").css("display", "flex").css("justify-content", "center")
                         .css("align-items", "center")
-                        .css("height", "100vh").css("margin", "0").css("background-color", "#f4f4f4")
+                        .css("height", "100vh").css("margin", "0").css("background-color", "#f0f0f0")
                         .addChild(new LoginPage()
                                 .addChild(new ButtonTag().plainText("Login")
+                                        .css("background-color", "#007bff").css("color", "white")
+                                        .css("padding", "10px 20px")
+                                        .css("border", "none").css("border-radius", "4px").css("cursor", "pointer")
+                                        .css("font-size", "16px").css("margin-top", "10px")
+                                        .css(":hover", "background-color", "#0056b3")
                                         .event(EventTypes.CLICK, (session, htmlElement) -> session
                                                 .getHtmlElement("username", htmlElement1 -> {
                                                     session.setCookie("username", htmlElement1.value());
                                                     session.redirect("/");
                                                 }))))));
-//        homePage.build();
         loginPage.build();
     }
 
@@ -103,7 +110,7 @@ public class ChatPage {
             sourceSession.redirect("/login");
             return;
         }
-        Tag sessionList = new ULTag().css("default", "display", "grid").css("grid-template-columns", "1fr 1fr")
+        Tag sessionList = new ULTag().css("display", "grid").css("grid-template-columns", "1fr 1fr")
                 .css("grid-gap", "10px");
         for (Session sessions : builder.getActiveSessionsByPage("/")) {
             if (ignoreCurrentUser && sourceSession == sessions) {
@@ -123,15 +130,13 @@ public class ChatPage {
 
     static class Chat extends Tag {
         private final WebPageBuilder webPageBuilder;
-
-        //
         public Chat(WebPageBuilder webPageBuilder) {
             super("div");
             this.webPageBuilder = webPageBuilder;
 
             Tag messages = new DivTag().css("overflow-y", "scroll").css("height", "600px")
-                    .css("background-color", "#eee")
-                    .css("overflow-x", "hidden").css("padding", "10px");
+                    .css("background-color", CHAT_BACKGROUND_COLOR)
+                    .css("overflow-x", "hidden").css("padding", "10px").css("border-radius", "8px");
             messages.addDynamicDataHandler(v -> {
                 for (int i = 0; i < ChatPage.messages.size(); i++) {
                     Message message = ChatPage.messages.get(i);
@@ -144,40 +149,54 @@ public class ChatPage {
                     messages.addDynamicChild(messageTag);
                 }
             });
-            css("background-color", "#fff").css("padding", "20px").css("border-radius", "5px")
-                    .css("box-shadow", "0 0 10px rgba(0, 0, 0, 0.1)");
+            css("background-color", MESSAGE_BACKGROUND_COLOR).css("padding", "20px").css("border-radius", "10px")
+                    .css("box-shadow", "0 4px 8px rgba(0, 0, 0, 0.1)");
             addChild(new HeadingTag(HeadingLevel.H2).plainText("Chat"));
-            // Div which will display the messages for now add some dummy messages
             addChild(new DivTag().css("display", "grid").css("grid-template-columns", "1fr").css("grid-gap", "10px")
                     .addChild(messages
                             .addAttribute(GlobalAttributes.ID, "messages")
-                            .css(" *", "max-width", "100%").css(" *", "margin", "2px")
-                            .event(EventTypes.LOAD, (session, htmlElement) -> {
-                                session.scrollTo("lastMessage");
-                            }))
-                    .addChild(new DivTag().css("display", "grid").css("grid-template-columns", "1fr 1fr")
-                            .css("grid-gap", "10px").css("align-items", "center")
-                            .addChild(new LabelTag().plainText("Message").addAttribute(FOR, "message")
-                                    .css(":hover", "text-decoration", "underline"))
-                            .addChild(new InputTag().addAttribute(TYPE, "text").addAttribute(NAME, "message")
-                                    .addAttribute(ID, "message")
-                                    .css("margin-bottom", "10px")
-                                    .event(EventTypes.KEYDOWN, (session, key) -> {
-                                        if (!key.eventValue().equalsIgnoreCase("enter")) {
-                                            return;
-                                        }
-                                        chat(session);
-                                    }))
-                            .addChild(new LabelTag().plainText("File").addAttribute(FOR, "file")
-                                    .css(":hover", "text-decoration", "underline"))
-                            .addChild(new InputTag().addAttribute(TYPE, "file").addAttribute(NAME, "file")
-                                    .addAttribute(ID, "file"))
+                            .css(" *", "max-width", "100%").css(" *", "margin", "5px"))
+                    .addChild(
+                            new DivTag().css("display", "flex").css("flex-direction", "column").css("gap", "10px")
+                                    .addChild(
+                                            new DivTag().css("display", "flex").css("gap", "10px")
+                                                    .css("align-items", "center")
+                                                    .addChild(new LabelTag().plainText("Message")
+                                                            .addAttribute(FOR, "message")
+                                                            .css(":hover", "text-decoration", "underline")
+                                                            .css("flex-shrink", "0"))
+                                                    .addChild(new InputTag().addAttribute(TYPE, "text")
+                                                            .addAttribute(NAME, "message")
+                                                            .addAttribute(ID, "message")
+                                                            .css("flex", "1")
+                                                            .css("border-radius", "4px").css("border", "1px solid #ccc")
+                                                            .css("padding", "8px")
+                                                            .event(EventTypes.KEYDOWN, (session, key) -> {
+                                                                if (!key.eventValue().equalsIgnoreCase("enter")) {
+                                                                    return;
+                                                                }
+                                                                chat(session);
+                                                            })))
+                                    .addChild(
+                                            new DivTag().css("display", "flex").css("gap", "40px")
+                                                    .addChild(new LabelTag().plainText("File").addAttribute(FOR, "file")
+                                                            .css(":hover", "text-decoration", "underline")
+                                                            .css("flex-shrink", "0"))
+                                                    .addChild(new InputTag().addAttribute(TYPE, "file")
+                                                            .addAttribute(NAME, "file")
+                                                            .addAttribute(ID, "file")
+                                                            .css("flex", "1"))))
+                    .addChild(new DivTag().css("display", "none").css("flex-direction", "column").css("gap", "10px")
                             .addChild(new ParagraphTag().plainText("Uploading progress: ").addClassName("hidden")
                                     .addAttribute(ID, "progressName"))
                             .addChild(new ParagraphTag().plainText("0%").addClassName("hidden").addAttribute(ID,
                                     "progress"))));
-            addChild(new ButtonTag().plainText("Send").event(EventTypes.CLICK, (session, htmlElement) -> chat(session))
-                    .css("margin-top", "10px"));
+            addChild(new ButtonTag().plainText("Send").css("background-color", "#28a745").css("color", "white")
+                    .css("padding", "10px 20px").css("border", "none").css("border-radius", "4px")
+                    .css("cursor", "pointer")
+                    .css("font-size", "16px").css("margin-top", "10px")
+                    .css(":hover", "background-color", "#218838")
+                    .event(EventTypes.CLICK, (session, htmlElement) -> chat(session)));
         }
 
         private void chat(Session sourceSession) {
@@ -216,7 +235,8 @@ public class ChatPage {
                 MessageTag messageTag = new MessageTag(username, messageValue, imageData, isGif);
                 messageTag.getImageLink().thenAccept(link -> {
                     if (link != null) {
-                        ImageTag image = (ImageTag) messageTag.getChildrenByClass(ImageTag.class).stream().findFirst().orElse(null);
+                        ImageTag image = (ImageTag) messageTag.getChildrenByClass(ImageTag.class).stream().findFirst()
+                                .orElse(null);
                         assert image != null;
                         image.setInternalImageUrl(link);
                     }
@@ -244,25 +264,33 @@ public class ChatPage {
     public static class Header extends DivTag {
         public Header() {
             super();
-            css("background-color", "#333").css("overflow", "hidden").css("display", "flex").css("align-items", "start")
+            css("background-color", "#333").css("overflow", "hidden").css("display", "flex")
+                    .css("align-items", "center")
+                    .css("padding", "10px 20px")
                     .addChild(new HeaderButton(true, "/", "Chat Demo"))
                     .addChild(new HeaderButton(false, "/demo/", "Demo")
                             .event(EventTypes.CLICK, (session, htmlElement) -> {
                                 session.redirect("/demo");
                             }))
                     .addChild(new HeaderButton(false, "/login", "Logout")
-                            .event(EventTypes.CLICK, (session, htmlElement) -> session.clearCookies()));
+                            .event(EventTypes.CLICK, (session, htmlElement) -> {
+                                session.clearCookies();
+                                session.redirect("/");
+                            }));
         }
 
         public static class HeaderButton extends ATag {
             public HeaderButton(boolean highlighted, String url, String text) {
                 super();
                 addAttribute(HREF, url).plainText(text)
-                        .css(":hover", "background-color", "#ddd").css("hover", "color", "black")
                         .css("float", "left").css("color", "#f2f2f2").css("text-align", "center")
                         .css("padding", "14px 16px").css("font-size", "17px").css("text-decoration", "none");
                 if (highlighted) {
-                    css("background-color", "#04AA6D").css("color", "#fff");
+                    css("background-color", "#04AA6D").css("color", "#fff")
+                    .css(":hover", "background-color", "#4f4f4f");
+                } else {
+                    css(":hover", "color", "black")
+                    .css(":hover", "background-color", "#ddd");
                 }
             }
         }
@@ -271,15 +299,17 @@ public class ChatPage {
     static class LoginPage extends Tag {
         public LoginPage() {
             super("div");
-            css("background-color", "#fff").css("padding", "20px").css("border-radius", "5px")
-                    .css("box-shadow", "0 0 10px rgba(0, 0, 0, 0.1)");
+            css("background-color", "#fff").css("padding", "20px").css("border-radius", "10px")
+                    .css("box-shadow", "0 4px 8px rgba(0, 0, 0, 0.1)");
             addChild(new HeadingTag(HeadingLevel.H2).plainText("Login"));
-            addChild(new DivTag().css("display", "grid").css("grid-template-columns", "1fr 1fr").css("grid-gap", "10px")
+            addChild(new DivTag().css("display", "grid").css("grid-template-columns", "1fr 4fr").css("grid-gap", "10px")
+                    .css("align-items", "baseline")
                     .addChild(new LabelTag().plainText("Username").addAttribute(FOR, "username")
                             .css(":hover", "text-decoration", "underline"))
                     .addChild(new InputTag().addAttribute(TYPE, "text").addAttribute(NAME, "username")
                             .addAttribute(ID, "username")
-                            .css("margin-bottom", "10px")
+                            .css("margin-bottom", "10px").css("border-radius", "4px").css("border", "1px solid #ccc")
+                            .css("padding", "8px")
                             .event(EventTypes.KEYDOWN, (session, key) -> {
                                 if (!key.eventValue().equalsIgnoreCase("enter")) {
                                     return;
@@ -292,8 +322,11 @@ public class ChatPage {
 
     public static class MessageTag extends DivTag {
         private CompletableFuture<String> imageLink;
+
         public MessageTag(String username, String message, byte[] imageData, boolean isGif) {
             super();
+            css("background-color", MESSAGE_BACKGROUND_COLOR).css("padding", "10px").css("border-radius", "8px")
+                    .css("border", "1px solid #ddd").css("margin-bottom", "10px");
             addChild(new BoldTag().plainText(username + ": "));
             addChild(new ParagraphTag().plainText(message));
             if (imageData != null) {
@@ -312,6 +345,8 @@ public class ChatPage {
 
         public MessageTag(String username, String message, String imageLink) {
             super();
+            css("background-color", MESSAGE_BACKGROUND_COLOR).css("padding", "10px").css("border-radius", "8px")
+                    .css("border", "1px solid #ddd").css("margin-bottom", "10px");
             addChild(new BoldTag().plainText(username + ": "));
             addChild(new ParagraphTag().plainText(message));
             if (imageLink != null) {
