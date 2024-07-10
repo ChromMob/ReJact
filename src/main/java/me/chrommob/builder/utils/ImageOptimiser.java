@@ -2,10 +2,7 @@ package me.chrommob.builder.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.sksamuel.scrimage.ImmutableImage;
 import com.sksamuel.scrimage.nio.AnimatedGif;
@@ -23,8 +20,10 @@ import io.javalin.Javalin;
 import me.chrommob.builder.html.FileUtils;
 
 public class ImageOptimiser {
-    public record ImageSize(int width, int height) {
-    }
+    public record ImageSize(int width, int height) {}
+    private static final Map<String, byte[]> imageCache = new HashMap<>();
+    private static final TreeMap<Long, String> imageCacheKeys = new TreeMap<>();
+    private static final Map<String, Long> imageCacheTime = new HashMap<>();
     private static final Map<String, ImageSize> imageSizes = new HashMap<>();
     private static final List<ImageReader> imageReaders = new ArrayList<>();
     static {
@@ -47,8 +46,17 @@ public class ImageOptimiser {
             if (path.startsWith("/_rejact/images/")) {
                 path = path.substring("/_rejact/images/".length());
             }
-            File file = new File(internalPath, path);
             ctx.contentType("image/webp");
+            if (imageCache.containsKey(path)) {
+                long time = imageCacheTime.get(path);
+                imageCacheKeys.remove(time);
+                imageCacheTime.remove(path);
+                imageCacheKeys.put(System.currentTimeMillis(), path);
+                imageCacheTime.put(path, System.currentTimeMillis());
+                ctx.result(imageCache.get(path)).header("Cache-Control", "public, max-age=31536000");
+                return;
+            }
+            File file = new File(internalPath, path);
             byte[] bytes = FileUtils.readFileToBytes(file);
             if (bytes == null) {
                 ctx.status(404);
@@ -107,6 +115,17 @@ public class ImageOptimiser {
                 q = 100;
             }
             bytes = image.bytes(WebpWriter.DEFAULT.withQ(q).withMultiThread());
+            if (imageCache.size() > 100) {
+                long oldestTime = imageCacheKeys.firstKey();
+                String oldestPath = imageCacheKeys.get(oldestTime);
+                imageCache.remove(oldestPath);
+                imageCacheKeys.remove(oldestTime);
+                imageCacheTime.remove(oldestPath);
+            }
+            imageCache.put(path, bytes);
+            long time = System.currentTimeMillis();
+            imageCacheKeys.put(time, path);
+            imageCacheTime.put(path, time);
             ctx.result(bytes).header("Cache-Control", "public, max-age=31536000");
         });
     }

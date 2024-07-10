@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Add configuration file for much easier initial setup">
+    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Improve showcase css">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/ImageTag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/html/tags/ImageTag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/test/ChatPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/test/ChatPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/utils/ImageOptimiser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/utils/ImageOptimiser.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -285,7 +284,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720464202856</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Improve showcase css">
+      <option name="closed" value="true" />
+      <created>1720467069681</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1720467069681</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -304,6 +311,7 @@
     <MESSAGE value="Fix image optimiser" />
     <MESSAGE value="Rename the package of the DraggableExamplePage to me.chrommob.demo so it makes sense." />
     <MESSAGE value="Add configuration file for much easier initial setup" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add configuration file for much easier initial setup" />
+    <MESSAGE value="Improve showcase css" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improve showcase css" />
   </component>
 </project>
