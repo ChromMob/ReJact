@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Improve showcase css">
+    <list default="true" id="218f9c4a-89ff-4324-83ba-3ab3f0f26ae7" name="Changes" comment="Add cache to ImageOptimiser">
+      <change afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/SessionData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/SessionDataGetter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/utils/ImageOptimiser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/utils/ImageOptimiser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/WebPageBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/WebPageBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/chrommob/builder/socket/Session.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -292,7 +295,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720467069681</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Add cache to ImageOptimiser">
+      <option name="closed" value="true" />
+      <created>1720639430841</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1720639430841</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -312,6 +323,7 @@
     <MESSAGE value="Rename the package of the DraggableExamplePage to me.chrommob.demo so it makes sense." />
     <MESSAGE value="Add configuration file for much easier initial setup" />
     <MESSAGE value="Improve showcase css" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improve showcase css" />
+    <MESSAGE value="Add cache to ImageOptimiser" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add cache to ImageOptimiser" />
   </component>
 </project>

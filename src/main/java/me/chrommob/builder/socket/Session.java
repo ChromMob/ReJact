@@ -1,6 +1,7 @@
 package me.chrommob.builder.socket;
 
 import me.chrommob.builder.Page;
+import me.chrommob.builder.WebPageBuilder;
 import me.chrommob.builder.html.File;
 import me.chrommob.builder.html.FileProgress;
 import me.chrommob.builder.html.HtmlElement;
@@ -19,7 +20,7 @@ import java.util.function.Consumer;
 
 public class Session {
     private final List<String> messageQueue = new ArrayList<>();
-    private final Map<String, String> cookies = new HashMap<>();
+    private final SessionData sessionData;
     private final Map<EventTypes, Set<Tag>> eventMap;
     private final Map<EventTypes, Set<Tag>> fileEventMap;
     private final Map<FileMessage, File> fileMap = new HashMap<>();
@@ -42,6 +43,7 @@ public class Session {
         this.fileEventMap = fileEventMap;
         this.webSocket = webSocket;
         internalCookie = Internal.generateRandomString(20);
+        this.sessionData = WebPageBuilder.getSessionDataGetter().getData(internalCookie);
         String js = "document.cookie = \"session=" + internalCookie + "; SameSite=Lax; Secure; Path=/;\";";
         sendMessage(js);
     }
@@ -335,15 +337,15 @@ public class Session {
     }
 
     public void setCookie(String key, String value) {
-        cookies.put(key, value);
+        sessionData.setCookie(key, value);
     }
 
     public void removeCookie(String key) {
-        cookies.remove(key);
+        sessionData.removeCookie(key);
     }
 
     public String getCookie(String cookie) {
-        return cookies.get(cookie);
+        return sessionData.getCookie(cookie);
     }
 
     public WebSocket getWebSocket() {
@@ -373,7 +375,7 @@ public class Session {
     }
 
     public void clearCookies() {
-        cookies.clear();
+        sessionData.clearCookies();
     }
 
     public void addChild(HtmlElement messages, Tag tag) {

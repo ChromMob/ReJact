@@ -27,6 +27,7 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
+import me.chrommob.builder.socket.SessionDataGetter;
 import org.java_websocket.WebSocket;
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 
@@ -48,8 +49,10 @@ public class WebPageBuilder {
     private final Map<EventTypes, Set<Tag>> eventMap = new HashMap<>();
     private final Map<EventTypes, Set<Tag>> fileEventMap = new HashMap<>();
     private final Map<String, Page> pages = new HashMap<>();
+    private static SessionDataGetter sessionDataGetter;
 
-    public WebPageBuilder(String ip, int webPort, int serverPort, int clientPort, String certificatePath, String password) {
+    public WebPageBuilder(String ip, int webPort, int serverPort, int clientPort, String certificatePath, String password, SessionDataGetter sessionDataGetter) {
+        WebPageBuilder.sessionDataGetter = sessionDataGetter;
         this.ip = ip;
         this.clientPort = clientPort;
 
@@ -110,6 +113,10 @@ public class WebPageBuilder {
                 }
             }
         }).start();
+    }
+
+    public WebPageBuilder(String ip, int webPort, int serverPort, int clientPort, String certificatePath, String password) {
+        this(ip, webPort, serverPort, clientPort, certificatePath, password, new SessionDataGetter.DefaultImpl());
     }
 
     public void start() {
@@ -258,5 +265,9 @@ public class WebPageBuilder {
                 .filter(session -> session.getWebSocket().isOpen() && session.getPage() != null
                         && session.getPage().getPath().equals(correctHref))
                 .collect(Collectors.toList());
+    }
+
+    public static SessionDataGetter getSessionDataGetter() {
+        return sessionDataGetter;
     }
 }
