@@ -116,7 +116,7 @@ public class WebPageBuilder {
     }
 
     public WebPageBuilder(String ip, int webPort, int serverPort, int clientPort, String certificatePath, String password) {
-        this(ip, webPort, serverPort, clientPort, certificatePath, password, new SessionDataGetter.DefaultImpl());
+        this(ip, webPort, serverPort, clientPort, certificatePath, password, new SessionDataGetter.DefaultInMemoryImpl());
     }
 
     public void start() {
