@@ -1,0 +1,2012 @@
+{
+ "__meta": {
+  "source": "mdn-browser-compat-data",
+  "version": "8.1.4"
+ },
+ "api": {
+  "AnimationEvent": {
+   "AnimationEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/AnimationEvent/AnimationEvent",
+     "spec_url": "https://drafts.csswg.org/css-animations/#dom-animationevent-animationevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/AnimationEvent",
+    "spec_url": "https://drafts.csswg.org/css-animations/#interface-animationevent",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "animation": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/AnimationEvent/animation",
+     "spec_url": "https://drafts.csswg.org/css-animations-2/#dom-animationevent-animation",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "animationName": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/AnimationEvent/animationName",
+     "spec_url": "https://drafts.csswg.org/css-animations/#dom-animationevent-animationname",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "elapsedTime": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/AnimationEvent/elapsedTime",
+     "spec_url": "https://drafts.csswg.org/css-animations/#dom-animationevent-elapsedtime",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "pseudoElement": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/AnimationEvent/pseudoElement",
+     "spec_url": "https://drafts.csswg.org/css-animations/#dom-animationevent-pseudoelement",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "ClipboardEvent": {
+   "ClipboardEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ClipboardEvent/ClipboardEvent",
+     "spec_url": "https://w3c.github.io/clipboard-apis/#dom-clipboardevent-clipboardevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/ClipboardEvent",
+    "spec_url": "https://w3c.github.io/clipboard-apis/#clipboard-event-interfaces",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "clipboardData": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ClipboardEvent/clipboardData",
+     "spec_url": "https://w3c.github.io/clipboard-apis/#clipboardevent-clipboarddata",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "DragEvent": {
+   "DragEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/DragEvent/DragEvent",
+     "spec_url": "https://html.spec.whatwg.org/multipage/dnd.html#the-dragevent-interface",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/DragEvent",
+    "spec_url": "https://html.spec.whatwg.org/multipage/dnd.html#the-dragevent-interface",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "dataTransfer": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/DragEvent/dataTransfer",
+     "spec_url": "https://html.spec.whatwg.org/multipage/dnd.html#dom-dragevent-datatransfer-dev",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "ErrorEvent": {
+   "ErrorEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ErrorEvent/ErrorEvent",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webappapis.html#errorevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/ErrorEvent",
+    "spec_url": "https://html.spec.whatwg.org/multipage/webappapis.html#errorevent",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "colno": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ErrorEvent/colno",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webappapis.html#dom-errorevent-colno",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "error": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ErrorEvent/error",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webappapis.html#dom-errorevent-error",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "filename": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ErrorEvent/filename",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webappapis.html#dom-errorevent-filename",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "lineno": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ErrorEvent/lineno",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webappapis.html#dom-errorevent-lineno",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "message": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ErrorEvent/message",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webappapis.html#dom-errorevent-message",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "Event": {
+   "Event": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/Event",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-event",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event",
+    "spec_url": "https://dom.spec.whatwg.org/#interface-event",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "bubbles": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/bubbles",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-bubbles\u2462",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "cancelBubble": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/cancelBubble",
+     "spec_url": "https://dom.spec.whatwg.org/#dom-event-cancelbubble",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "cancelable": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/cancelable",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-cancelable\u2461",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "composed": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/composed",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-composed\u2460",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "composedPath": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/composedPath",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-composedpath\u2460",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "currentTarget": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/currentTarget",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-currenttarget\u2461",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "defaultPrevented": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/defaultPrevented",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-defaultprevented\u2460",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "eventPhase": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/eventPhase",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-eventphase\u2462",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "explicitOriginalTarget": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/explicitOriginalTarget",
+     "spec_url": null,
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": false
+     }
+    }
+   },
+   "initEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/initEvent",
+     "spec_url": "https://dom.spec.whatwg.org/#dom-event-initevent",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "isTrusted": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/isTrusted",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-istrusted\u2460",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "originalTarget": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/originalTarget",
+     "spec_url": null,
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": false
+     }
+    }
+   },
+   "preventDefault": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/preventDefault",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-preventdefault\u2462",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "returnValue": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/returnValue",
+     "spec_url": "https://dom.spec.whatwg.org/#dom-event-returnvalue",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "srcElement": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/srcElement",
+     "spec_url": "https://dom.spec.whatwg.org/#dom-event-srcelement",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "stopImmediatePropagation": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/stopImmediatePropagation",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-stopimmediatepropagation\u2460",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "stopPropagation": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/stopPropagation",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-stoppropagation\u2460",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "target": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/target",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-target\u2462",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "timeStamp": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/timeStamp",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-timestamp\u2460",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "type": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/Event/type",
+     "spec_url": "https://dom.spec.whatwg.org/#ref-for-dom-event-type\u2463",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "FocusEvent": {
+   "FocusEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/FocusEvent/FocusEvent",
+     "spec_url": "https://w3c.github.io/uievents/#dom-focusevent-focusevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/FocusEvent",
+    "spec_url": "https://w3c.github.io/uievents/#interface-focusevent",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "relatedTarget": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/FocusEvent/relatedTarget",
+     "spec_url": "https://w3c.github.io/uievents/#dom-focusevent-relatedtarget",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "InputEvent": {
+   "InputEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/InputEvent/InputEvent",
+     "spec_url": "https://w3c.github.io/uievents/#dom-inputevent-inputevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/InputEvent",
+    "spec_url": [
+     "https://w3c.github.io/input-events/#interface-InputEvent",
+     "https://w3c.github.io/uievents/#interface-inputevent"
+    ],
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "data": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/InputEvent/data",
+     "spec_url": "https://w3c.github.io/input-events/#dfn-data",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "dataTransfer": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/InputEvent/dataTransfer",
+     "spec_url": "https://w3c.github.io/input-events/#dom-inputevent-datatransfer",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "getTargetRanges": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/InputEvent/getTargetRanges",
+     "spec_url": "https://w3c.github.io/input-events/#dom-inputevent-gettargetranges",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "inputType": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/InputEvent/inputType",
+     "spec_url": "https://w3c.github.io/uievents/#dom-inputevent-inputtype",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    },
+    "insertFromPasteAsQuotation": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://w3c.github.io/input-events/#:~:text=insertFromPasteAsQuotation",
+      "status": {
+       "deprecated": false,
+       "experimental": true,
+       "standard_track": true
+      }
+     }
+    }
+   },
+   "isComposing": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/InputEvent/isComposing",
+     "spec_url": "https://w3c.github.io/uievents/#dom-inputevent-iscomposing",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "KeyboardEvent": {
+   "KeyboardEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/KeyboardEvent",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-keyboardevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent",
+    "spec_url": "https://w3c.github.io/uievents/#interface-keyboardevent",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "altKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/altKey",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-altkey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "charCode": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/charCode",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-charcode",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "code": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/code",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-code",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "ctrlKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/ctrlKey",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-ctrlkey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "getModifierState": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/getModifierState",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-getmodifierstate",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    },
+    "key_parameter_accel": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": null,
+      "status": {
+       "deprecated": true,
+       "experimental": false,
+       "standard_track": false
+      }
+     }
+    },
+    "key_parameter_alt": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "key_parameter_altgraph": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "key_parameter_capslock": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "key_parameter_control": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "key_parameter_fn": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "key_parameter_meta": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "key_parameter_numlock": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "key_parameter_os": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": null,
+      "status": {
+       "deprecated": true,
+       "experimental": false,
+       "standard_track": false
+      }
+     }
+    },
+    "key_parameter_scrolllock": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "key_parameter_shift": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "key_parameter_symbol": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents-key/#keys-modifier",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    }
+   },
+   "initKeyboardEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/initKeyboardEvent",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-initkeyboardevent",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "isComposing": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/isComposing",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-iscomposing",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "key": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/key",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-key",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    },
+    "dead_key": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://www.w3.org/TR/uievents/#dead-key",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "non_printable_keys": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-key",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "printable_key": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-key",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    }
+   },
+   "keyCode": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/keyCode",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-keycode",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "keyIdentifier": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/keyIdentifier",
+     "spec_url": null,
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": false
+     }
+    }
+   },
+   "location": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/location",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-location",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "metaKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/metaKey",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-metakey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "repeat": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/repeat",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-repeat",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "shiftKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/KeyboardEvent/shiftKey",
+     "spec_url": "https://w3c.github.io/uievents/#dom-keyboardevent-shiftkey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "MouseEvent": {
+   "MouseEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/MouseEvent",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-constructor",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent",
+    "spec_url": [
+     "https://w3c.github.io/pointerevents/#mouseevent-interface",
+     "https://drafts.csswg.org/cssom-view/#extensions-to-the-mouseevent-interface",
+     "https://w3c.github.io/pointerlock/#extensions-to-the-mouseevent-interface"
+    ],
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "altKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/altKey",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-altkey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "button": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/button",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-button",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "buttons": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/buttons",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-buttons",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "clientX": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/clientX",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-clientx",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "clientY": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/clientY",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-clienty",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "ctrlKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/ctrlKey",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-ctrlkey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "getModifierState": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/getModifierState",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-getmodifierstate",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    },
+    "accel_support": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": null,
+      "status": {
+       "deprecated": true,
+       "experimental": false,
+       "standard_track": false
+      }
+     }
+    }
+   },
+   "initMouseEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/initMouseEvent",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-initmouseevent",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "layerX": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/layerX",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-layerx",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "layerY": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/layerY",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-layery",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "metaKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/metaKey",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-metakey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "movementX": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/movementX",
+     "spec_url": "https://w3c.github.io/pointerlock/#dom-mouseevent-movementx",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "movementY": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/movementY",
+     "spec_url": "https://w3c.github.io/pointerlock/#dom-mouseevent-movementy",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "offsetX": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/offsetX",
+     "spec_url": "https://drafts.csswg.org/cssom-view/#dom-mouseevent-offsetx",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "offsetY": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/offsetY",
+     "spec_url": "https://drafts.csswg.org/cssom-view/#dom-mouseevent-offsety",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "pageX": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/pageX",
+     "spec_url": "https://drafts.csswg.org/cssom-view/#dom-mouseevent-pagex",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "pageY": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/pageY",
+     "spec_url": "https://drafts.csswg.org/cssom-view/#dom-mouseevent-pagey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "relatedTarget": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/relatedTarget",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-relatedtarget",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    },
+    "drag_events": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://html.spec.whatwg.org/multipage/dnd.html#:~:text=relatedtarget",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    }
+   },
+   "screenX": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/screenX",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-screenx",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "screenY": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/screenY",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-screeny",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "shiftKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/shiftKey",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-mouseevent-shiftkey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "x": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/x",
+     "spec_url": "https://drafts.csswg.org/cssom-view/#dom-mouseevent-x",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "y": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/MouseEvent/y",
+     "spec_url": "https://drafts.csswg.org/cssom-view/#dom-mouseevent-y",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "PointerEvent": {
+   "PointerEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/PointerEvent",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-constructor",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    },
+    "options_altitudeAngle_parameter": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://w3c.github.io/pointerevents/#dom-pointereventinit-altitudeangle",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    },
+    "options_azimuthAngle_parameter": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": "https://w3c.github.io/pointerevents/#dom-pointereventinit-azimuthangle",
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent",
+    "spec_url": "https://w3c.github.io/pointerevents/#pointerevent-interface",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "altitudeAngle": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/altitudeAngle",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-altitudeangle",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "azimuthAngle": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/azimuthAngle",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-azimuthangle",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "getCoalescedEvents": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/getCoalescedEvents",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-getcoalescedevents",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "getPredictedEvents": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/getPredictedEvents",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-getpredictedevents",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "height": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/height",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-height",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "isPrimary": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/isPrimary",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-isprimary",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "persistentDeviceId": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/persistentDeviceId",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-persistentdeviceid",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "pointerId": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/pointerId",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-pointerid",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "pointerType": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/pointerType",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-pointertype",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    },
+    "fractional_coordinates": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": [
+       "https://w3c.github.io/pointerevents/#dom-pointereventinit-pointertype",
+       "https://w3c.github.io/pointerevents/#event-coordinates"
+      ],
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    }
+   },
+   "pressure": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/pressure",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-pressure",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "tangentialPressure": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/tangentialPressure",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-tangentialpressure",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "tiltX": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/tiltX",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-tiltx",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "tiltY": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/tiltY",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-tilty",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "twist": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/twist",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-twist",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "width": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/PointerEvent/width",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-pointerevent-width",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "ProgressEvent": {
+   "ProgressEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ProgressEvent/ProgressEvent",
+     "spec_url": "https://xhr.spec.whatwg.org/#dom-progressevent-progressevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    },
+    "loaded_total_options_accept_double": {
+     "__compat": {
+      "mdn_url": null,
+      "spec_url": [
+       "https://xhr.spec.whatwg.org/#dom-progressevent-loaded",
+       "https://xhr.spec.whatwg.org/#dom-progressevent-total"
+      ],
+      "status": {
+       "deprecated": false,
+       "experimental": false,
+       "standard_track": true
+      }
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/ProgressEvent",
+    "spec_url": "https://xhr.spec.whatwg.org/#interface-progressevent",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "lengthComputable": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ProgressEvent/lengthComputable",
+     "spec_url": "https://xhr.spec.whatwg.org/#dom-progressevent-lengthcomputable",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "loaded": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ProgressEvent/loaded",
+     "spec_url": "https://xhr.spec.whatwg.org/#dom-progressevent-loaded",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "total": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/ProgressEvent/total",
+     "spec_url": "https://xhr.spec.whatwg.org/#dom-progressevent-total",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "worker_support": {
+    "__compat": {
+     "mdn_url": null,
+     "spec_url": "https://xhr.spec.whatwg.org/#interface-progressevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "StorageEvent": {
+   "StorageEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/StorageEvent/StorageEvent",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webstorage.html#the-storageevent-interface",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/StorageEvent",
+    "spec_url": "https://html.spec.whatwg.org/multipage/webstorage.html#the-storageevent-interface",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "initStorageEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/StorageEvent/initStorageEvent",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webstorage.html#dom-storageevent-initstorageevent",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "key": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/StorageEvent/key",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webstorage.html#dom-storageevent-key-dev",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "newValue": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/StorageEvent/newValue",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webstorage.html#dom-storageevent-newvalue-dev",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "oldValue": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/StorageEvent/oldValue",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webstorage.html#dom-storageevent-oldvalue-dev",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "storageArea": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/StorageEvent/storageArea",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webstorage.html#dom-storageevent-storagearea-dev",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "url": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/StorageEvent/url",
+     "spec_url": "https://html.spec.whatwg.org/multipage/webstorage.html#dom-storageevent-url-dev",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "SubmitEvent": {
+   "SubmitEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/SubmitEvent/SubmitEvent",
+     "spec_url": "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#submitevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/SubmitEvent",
+    "spec_url": "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#the-submitevent-interface",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "submitter": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/SubmitEvent/submitter",
+     "spec_url": "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#the-submitevent-interface:dom-submitevent-submitter-2",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "TouchEvent": {
+   "TouchEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TouchEvent/TouchEvent",
+     "spec_url": "https://w3c.github.io/touch-events/#dom-touchevent-constructor",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/TouchEvent",
+    "spec_url": "https://w3c.github.io/touch-events/#touchevent-interface",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "altKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TouchEvent/altKey",
+     "spec_url": "https://w3c.github.io/touch-events/#dom-touchevent-altkey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "changedTouches": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TouchEvent/changedTouches",
+     "spec_url": "https://w3c.github.io/touch-events/#dom-touchevent-changedtouches",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "ctrlKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TouchEvent/ctrlKey",
+     "spec_url": "https://w3c.github.io/touch-events/#dom-touchevent-ctrlkey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "metaKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TouchEvent/metaKey",
+     "spec_url": "https://w3c.github.io/touch-events/#dom-touchevent-metakey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "shiftKey": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TouchEvent/shiftKey",
+     "spec_url": "https://w3c.github.io/touch-events/#dom-touchevent-shiftkey",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "targetTouches": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TouchEvent/targetTouches",
+     "spec_url": "https://w3c.github.io/touch-events/#dom-touchevent-targettouches",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "touches": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TouchEvent/touches",
+     "spec_url": "https://w3c.github.io/touch-events/#dom-touchevent-touches",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "TransitionEvent": {
+   "TransitionEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TransitionEvent/TransitionEvent",
+     "spec_url": "https://drafts.csswg.org/css-transitions/#dom-transitionevent-transitionevent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/TransitionEvent",
+    "spec_url": "https://drafts.csswg.org/css-transitions/#interface-transitionevent",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "animation": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TransitionEvent/animation",
+     "spec_url": "https://drafts.csswg.org/css-transitions-2/#Events-TransitionEvent-animation",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "elapsedTime": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TransitionEvent/elapsedTime",
+     "spec_url": "https://drafts.csswg.org/css-transitions/#Events-TransitionEvent-elapsedTime",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "propertyName": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TransitionEvent/propertyName",
+     "spec_url": "https://drafts.csswg.org/css-transitions/#Events-TransitionEvent-propertyName",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "pseudoElement": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/TransitionEvent/pseudoElement",
+     "spec_url": "https://drafts.csswg.org/css-transitions/#Events-TransitionEvent-pseudoElement",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "UIEvent": {
+   "UIEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/UIEvent/UIEvent",
+     "spec_url": "https://w3c.github.io/uievents/#dom-uievent-uievent",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/UIEvent",
+    "spec_url": "https://w3c.github.io/uievents/#idl-uievent",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "detail": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/UIEvent/detail",
+     "spec_url": "https://w3c.github.io/uievents/#dom-uievent-detail",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "initUIEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/UIEvent/initUIEvent",
+     "spec_url": "https://w3c.github.io/uievents/#dom-uievent-inituievent",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "sourceCapabilities": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/UIEvent/sourceCapabilities",
+     "spec_url": "https://wicg.github.io/input-device-capabilities/#dom-uievent-sourcecapabilities",
+     "status": {
+      "deprecated": false,
+      "experimental": true,
+      "standard_track": true
+     }
+    }
+   },
+   "view": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/UIEvent/view",
+     "spec_url": "https://w3c.github.io/uievents/#dom-uievent-view",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "which": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/UIEvent/which",
+     "spec_url": "https://w3c.github.io/uievents/#dom-uievent-which",
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   }
+  },
+  "WheelEvent": {
+   "WheelEvent": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/WheelEvent/WheelEvent",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-wheelevent-constructor",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "__compat": {
+    "mdn_url": "https://developer.mozilla.org/docs/Web/API/WheelEvent",
+    "spec_url": "https://w3c.github.io/pointerevents/#interface-wheelevent",
+    "status": {
+     "deprecated": false,
+     "experimental": false,
+     "standard_track": true
+    }
+   },
+   "deltaMode": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/WheelEvent/deltaMode",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-wheelevent-deltamode",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "deltaX": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/WheelEvent/deltaX",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-wheelevent-deltax",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "deltaY": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/WheelEvent/deltaY",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-wheelevent-deltay",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "deltaZ": {
+    "__compat": {
+     "mdn_url": "https://developer.mozilla.org/docs/Web/API/WheelEvent/deltaZ",
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-wheelevent-deltaz",
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": true
+     }
+    }
+   },
+   "momentum": {
+    "__compat": {
+     "mdn_url": null,
+     "spec_url": "https://w3c.github.io/pointerevents/#dom-wheeleventinit-momentum",
+     "status": {
+      "deprecated": false,
+      "experimental": true,
+      "standard_track": true
+     }
+    }
+   },
+   "pinch_to_zoom_support": {
+    "__compat": {
+     "mdn_url": null,
+     "spec_url": null,
+     "status": {
+      "deprecated": false,
+      "experimental": false,
+      "standard_track": false
+     }
+    }
+   },
+   "wheelDelta": {
+    "__compat": {
+     "mdn_url": null,
+     "spec_url": null,
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": false
+     }
+    }
+   },
+   "wheelDeltaX": {
+    "__compat": {
+     "mdn_url": null,
+     "spec_url": null,
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": false
+     }
+    }
+   },
+   "wheelDeltaY": {
+    "__compat": {
+     "mdn_url": null,
+     "spec_url": null,
+     "status": {
+      "deprecated": true,
+      "experimental": false,
+      "standard_track": false
+     }
+    }
+   }
+  }
+ }
+}

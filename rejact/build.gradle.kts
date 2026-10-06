@@ -2,15 +2,18 @@ import java.io.File
 
 // ReJact v2 framework. Zero third-party dependencies.
 //
-// Codegen: SpecGen.java + Json.java bootstrap, then tags/events/bindings are generated
-// from spec/elements.json into build/generated/rejact (never committed).
+// Spec pipeline:
+//   spec/mdn (MDN browser-compat-data) + spec/overlay.json
+//     -> SpecFromMdn -> build/generated/spec/elements.json
+//     -> SpecGen     -> build/generated/rejact/{java,resources}
 // Runtime: rejact-core.js + generated rejact-bindings.js -> /rejact-runtime.js on the classpath.
 
-val specFile = layout.projectDirectory.file("spec/elements.json")
+val htmlRef = layout.projectDirectory.file("spec/mdn/html.json")
+val overlayFile = layout.projectDirectory.file("spec/overlay.json")
 val coreJs = layout.projectDirectory.file("src/main/resources/rejact-core.js")
 val squeezePy = layout.projectDirectory.file("tools/squeeze.py")
 
-// SpecGen writes <out>/java and <out>/resources.
+val generatedSpec = layout.buildDirectory.file("generated/spec/elements.json")
 val genOut = layout.buildDirectory.dir("generated/rejact")
 val genJava = genOut.map { it.dir("java") }
 val genBindings = genOut.map { it.file("resources/rejact-bindings.js") }
@@ -21,6 +24,7 @@ val compileSpecgen = tasks.register<JavaCompile>("compileSpecgen") {
     setSource(
         listOf(
             "src/main/java/me/chrommob/rejact/Json.java",
+            "src/main/java/me/chrommob/rejactgen/SpecFromMdn.java",
             "src/main/java/me/chrommob/rejactgen/SpecGen.java",
         )
     )
@@ -30,16 +34,32 @@ val compileSpecgen = tasks.register<JavaCompile>("compileSpecgen") {
     options.release.set(21)
 }
 
-val generateRejact = tasks.register<JavaExec>("generateRejact") {
+val generateSpec = tasks.register<JavaExec>("generateSpec") {
     group = "build"
-    description = "Generate typed tags/events and JS bindings from spec/elements.json"
+    description = "Generate the element/event spec from MDN browser-compat-data + overlay"
     dependsOn(compileSpecgen)
     classpath = files(specgenClasses)
+    mainClass.set("me.chrommob.rejactgen.SpecFromMdn")
+    inputs.file(htmlRef)
+    inputs.file(overlayFile)
+    outputs.file(generatedSpec)
+    args(
+        htmlRef.asFile.absolutePath,
+        overlayFile.asFile.absolutePath,
+        generatedSpec.get().asFile.absolutePath,
+    )
+}
+
+val generateRejact = tasks.register<JavaExec>("generateRejact") {
+    group = "build"
+    description = "Generate typed tags/events and JS bindings from the MDN-derived spec"
+    dependsOn(generateSpec)
+    classpath = files(specgenClasses)
     mainClass.set("me.chrommob.rejactgen.SpecGen")
-    inputs.file(specFile)
+    inputs.file(generatedSpec)
     outputs.dir(genOut)
     args(
-        specFile.asFile.absolutePath,
+        generatedSpec.get().asFile.absolutePath,
         genOut.get().asFile.absolutePath,
     )
 }

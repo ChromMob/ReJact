@@ -68,7 +68,16 @@ function attach(uid, el, def) {
     el.addEventListener(ev, function (e) {
       if (prevent.indexOf(ev) >= 0) e.preventDefault();
       var payload = {};
-      try { payload = (RJ_PULL[ev] || function () { return {}; })(e); } catch (err) {}
+      try {
+        var spec = RJ_PULL[ev];
+        if (spec) {
+          for (var i = 0; i < spec.length; i++) {
+            var k = spec[i][0], t = spec[i][1], val = e[k];
+            payload[k] = t === 3 ? (val ? val.length | 0 : 0)
+              : t === 1 ? val | 0 : t === 2 ? !!val : t === 4 ? +val : val;
+          }
+        }
+      } catch (err) {}
       post(frame(2, RJ_CODES[ev] || 0, uid, vp(payload)));
     });
   });

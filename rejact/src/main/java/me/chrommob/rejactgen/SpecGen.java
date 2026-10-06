@@ -199,6 +199,9 @@ public final class SpecGen {
         String prefix = isDefault ? "    default " : "    public ";
         if (!values.isEmpty()) {
             String enumName = capitalize(method);
+            // String overload first: HTML attributes accept any value; the enum is sugar.
+            sb.append(prefix).append(returnType).append(' ').append(method).append("(String value) {\n");
+            sb.append("        return attr(\"").append(name).append("\", value);\n    }\n\n");
             sb.append(prefix).append(returnType).append(' ').append(method).append('(').append(enumName)
                     .append(" value) {\n");
             sb.append("        return attr(\"").append(name).append("\", value.html);\n    }\n\n");
@@ -230,9 +233,10 @@ public final class SpecGen {
 
     private static void writeBindings(Path resRoot, List<Object> events) throws IOException {
         StringBuilder sb = new StringBuilder(512);
-        // One binding per distinct payload extractor; identical event shapes share it.
+        // Data-driven pullers: one tiny table per event shape, shared by identical shapes.
         Map<String, String> vars = new LinkedHashMap<>();
         List<String> entries = new ArrayList<>();
+        List<String> names = new ArrayList<>();
         for (Object o : events) {
             Map<String, Object> event = Json.obj(o);
             String body = Json.str(event, "js");
@@ -241,22 +245,37 @@ public final class SpecGen {
                 var = "_" + vars.size();
                 vars.put(body, var);
             }
-            entries.add("  \"" + Json.str(event, "name") + "\": " + var);
+            entries.add("  \"" + Json.str(event, "name") + "\":" + var);
+            names.add(Json.str(event, "name"));
         }
         for (Map.Entry<String, String> binding : vars.entrySet()) {
             sb.append("var ").append(binding.getValue()).append('=').append(binding.getKey()).append(";\n");
         }
-        sb.append("var RJ_PULL = {\n");
-        sb.append(String.join(",\n", entries)).append("\n};\n");
-        sb.append("var RJ_CODES = {\n");
-        List<String> codes = new ArrayList<>();
-        int code = 1;
-        for (Object o : events) {
-            codes.add("  \"" + Json.str(Json.obj(o), "name") + "\": " + code++);
-        }
-        sb.append(String.join(",\n", codes)).append("\n};\n");
+        sb.append("var RJ_PULL={\n");
+        sb.append(String.join(",", entries)).append("\n};\n");
+        // Compact name->code map: one string list, assigned on the client.
+        sb.append("var RJ_CODES={},RJ_N=");
+        sb.append(jsonStr(String.join(" ", names))).append(".split(' ');\n");
+        sb.append("for(var RJ_I=0;RJ_I<RJ_N.length;RJ_I++)RJ_CODES[RJ_N[RJ_I]]=RJ_I+1;\n");
         Files.createDirectories(resRoot);
         Files.writeString(resRoot.resolve("rejact-bindings.js"), sb.toString(), StandardCharsets.UTF_8);
+    }
+
+    private static String jsonStr(String s) {
+        StringBuilder sb = new StringBuilder(s.length() + 2);
+        sb.append('"');
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '"' || c == '\\') {
+                sb.append('\\').append(c);
+            } else if (c < 0x20) {
+                sb.append(String.format("\\u%04x", (int) c));
+            } else {
+                sb.append(c);
+            }
+        }
+        sb.append('"');
+        return sb.toString();
     }
 
     // ---------- helpers ----------
