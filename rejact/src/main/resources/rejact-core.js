@@ -70,8 +70,10 @@ function attach(uid, el, def) {
         if (s) {
           if (typeof s === 'string') s = RJ_PULL[ev] = s.split(',');
           for (var i = 0; i < s.length; i += 2) {
-            var k = s[i], t = +s[i + 1], v = e[k];
-            payload[k] = t === 3 ? (v ? v.length | 0 : 0) : t === 1 ? v | 0 : t === 2 ? !!v : v;
+            var k = s[i], t = +s[i + 1], from = e, key = k;
+            if (k.charAt(0) === '@') { key = k.slice(1); from = e.target || e; }
+            var v = from[key];
+            payload[key] = t === 3 ? (v ? v.length | 0 : 0) : t === 1 ? v | 0 : t === 2 ? !!v : v;
           }
         }
       } catch (err) {}
@@ -152,6 +154,15 @@ function apply(o) {
     return o;
   }
   if (t === 1) {
+    var m = sstr(o); var a = sstr(m[1]); o = a[1];
+    var name = m[0], args = JSON.parse(a[0] || '[]');
+    var dot = name.indexOf('.'), obj = el, fn = name;
+    if (dot > 0) { obj = el && el[name.slice(0, dot)]; fn = name.slice(dot + 1); }
+    if (obj && typeof obj[fn] === 'function') obj[fn].apply(obj, args);
+    else if (SYS[name]) SYS[name](args, el, uid);
+    return o;
+  }
+  if (t === 2) {
     var rp = dv.getUint8(o); o += 1;
     var h = sstr(o); var sm = submap(h[1]); o = sm[1];
     if (el) {
@@ -165,15 +176,6 @@ function apply(o) {
         if (scrollable && near && el.lastElementChild) el.lastElementChild.scrollIntoView({ block: 'end' });
       }
     }
-    return o;
-  }
-  if (t === 2) {
-    var m = sstr(o); var a = sstr(m[1]); o = a[1];
-    var name = m[0], args = JSON.parse(a[0] || '[]');
-    var dot = name.indexOf('.'), obj = el, fn = name;
-    if (dot > 0) { obj = el && el[name.slice(0, dot)]; fn = name.slice(dot + 1); }
-    if (obj && typeof obj[fn] === 'function') obj[fn].apply(obj, args);
-    else if (SYS[name]) SYS[name](args, el, uid);
     return o;
   }
   if (t === 3) { if (el) { purge(el); el.remove(); } return o; }

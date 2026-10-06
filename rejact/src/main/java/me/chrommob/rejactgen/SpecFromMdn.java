@@ -121,6 +121,10 @@ public final class SpecFromMdn {
                 field.put("name", String.valueOf(pair.get(0)));
                 String type = String.valueOf(pair.get(1));
                 field.put("type", type);
+                // Optional 3rd slot: "target" reads from event.target (form value/checked).
+                if (pair.size() > 2) {
+                    field.put("source", String.valueOf(pair.get(2)));
+                }
                 fields.add(field);
             }
             event.put("fields", fields);
@@ -228,6 +232,10 @@ public final class SpecFromMdn {
                 sb.append(',');
             }
             String name = Json.str(f, "name");
+            // "@" prefix = read from event.target (form controls), payload key stays bare.
+            if ("target".equals(String.valueOf(f.getOrDefault("source", "")))) {
+                sb.append('@');
+            }
             sb.append(name).append(',').append(fieldKind(name, Json.str(f, "type")));
         }
         return sb.toString();
