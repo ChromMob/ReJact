@@ -4,6 +4,12 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# ReJact v2 durable Store state (sessions, accounts, feed caches)
+data/
+
+# Local compose feature docs are not tracked
+docs/compose/
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
