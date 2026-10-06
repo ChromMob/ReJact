@@ -13,9 +13,9 @@ subprojects {
         mavenLocal()
     }
 
-    // Cross-compile to Java 17 bytecode on whatever JDK the build runs on.
+    // Cross-compile to Java 21 bytecode (pattern matching in switch) on whatever JDK the build runs on.
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
-        options.release.set(17)
+        options.release.set(21)
     }
 }
