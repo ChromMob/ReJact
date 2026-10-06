@@ -104,6 +104,7 @@ val assembleRuntime = tasks.register("assembleRuntime") {
         }
 
         val ok = (esbuild != null && compact(listOf(esbuild.absolutePath, "--minify", "--loader=js"))) ||
+            compact(listOf("npx", "--yes", "esbuild", "--minify", "--loader=js")) ||
             compact(listOf("python3", squeezePy.asFile.absolutePath))
         if (!ok) outFile.writeText(raw)
         logger.lifecycle("rejact-runtime.js ${outFile.length()} bytes")

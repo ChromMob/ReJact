@@ -2,16 +2,15 @@ package me.chrommob.rejact;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import me.chrommob.rejact.gen.EventCodes;
 
 /**
- * Binary wire codec. Everything on the WebSocket is a binary frame with a fixed layout and a
- * closed opcode table: no repeated key names, no per-message JSON envelopes.
+ * Binary wire codec. Server → client is a batch of generic commands
+ * ({@code set} / {@code call} / {@code html} / {@code del} / {@code var} / {@code bind}),
+ * not a closed app-level opcode table.
  *
  * <p>Client to server (one frame per message):
  *
@@ -22,11 +21,11 @@ import me.chrommob.rejact.gen.EventCodes;
  *   type 3 = page unload
  * </pre>
  *
- * <p>Server to client (one frame per op batch):
+ * <p>Server to client (one frame per command batch):
  *
  * <pre>
- *   [0xB1][count: u8][op...]  op = [opcode: u8][el: u8 len + bytes][args per opcode]
- *   strings are [u16 LE len + UTF-8 bytes]; a null attribute value is u16 0xFFFF.
+ *   [0xB1][count: u8][cmd...]  cmd = [kind: u8][el: u8 len + bytes][args per kind]
+ *   strings are [u16 LE len + UTF-8 bytes]; null values are u16 0xFFFF.
  * </pre>
  */
 final class Wire {
@@ -59,14 +58,13 @@ final class Wire {
         if (o + plen > frame.length) {
             throw new IllegalArgumentException("payload overflow");
         }
-        Map<String, Object> payload = plen == 0 ? new LinkedHashMap<>()
+        Map<String, Object> payload = plen == 0 ? new java.util.LinkedHashMap<>()
                 : Json.obj(Json.parse(new String(frame, o, plen, StandardCharsets.UTF_8)));
         return new Inbound(type, evCode, el, payload);
     }
 
     static byte[] encode(List<Ops.Op> ops) {
         if (ops.size() > 255) {
-            // The batch count is u8: wrapping it desyncs the client's op stream silently.
             throw new IllegalArgumentException("op batch too large: " + ops.size() + " (max 255)");
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream(64 + ops.size() * 16);
@@ -79,86 +77,48 @@ final class Wire {
     }
 
     private static void encodeOp(ByteArrayOutputStream out, Ops.Op op) {
-        out.write(op.opcode());
-        String el = switch (op) {
-            case Ops.Text t -> t.el();
-            case Ops.Value v -> v.el();
-            case Ops.Attrib a -> a.el();
-            case Ops.Css s -> s.el();
-            case Ops.Cls c -> c.el();
-            case Ops.Append a -> a.el();
-            case Ops.Replace r -> r.el();
-            case Ops.Remove r -> r.el();
-            case Ops.Focus f -> f.el();
-            case Ops.Scroll s -> s.el();
-            case Ops.ReadFile r -> r.el();
-            case Ops.Navigate ignored -> "";
-            case Ops.Cookie ignored -> "";
-            case Ops.ScrollWindow ignored -> "";
-            case Ops.Site ignored -> "";
-            case Ops.HistoryBack ignored -> "";
-            case Ops.Bind b -> b.el();
-            case Ops.SetVar ignored -> "";
-        };
-        writeShort(out, el);
+        out.write(op.kind());
+        writeShort(out, elOf(op));
         switch (op) {
-            case Ops.Text t -> writeString(out, t.text());
-            case Ops.Value v -> writeString(out, v.value());
-            case Ops.Attrib a -> {
-                writeString(out, a.name());
-                if (a.value() == null) {
+            case Ops.Set s -> {
+                writeString(out, s.path());
+                if (s.value() == null) {
                     out.write(NULL_STR);
                     out.write(NULL_STR >>> 8);
                 } else {
-                    writeString(out, a.value());
+                    writeString(out, s.value());
                 }
             }
-            case Ops.Css s -> {
-                writeString(out, s.prop());
-                writeString(out, s.value());
+            case Ops.Call c -> {
+                writeString(out, c.method());
+                writeString(out, c.args());
             }
-            case Ops.Cls c -> {
-                out.write(c.add().size());
-                for (String name : c.add()) {
-                    writeString(out, name);
-                }
-                out.write(c.remove().size());
-                for (String name : c.remove()) {
-                    writeString(out, name);
-                }
+            case Ops.Html h -> {
+                out.write(h.replace() ? 1 : 0);
+                writeSubtree(out, h.html(), h.subs());
             }
-            case Ops.Append a -> writeSubtree(out, a.html(), a.subs());
-            case Ops.Replace r -> writeSubtree(out, r.html(), r.subs());
-            case Ops.ScrollWindow w -> {
-                out.write(w.y());
-                out.write(w.y() >>> 8);
-                out.write(w.y() >>> 16);
-                out.write(w.y() >>> 24);
+            case Ops.Del ignored -> {
             }
-            case Ops.Site s -> {
-                writeString(out, s.name());
-                writeString(out, s.param());
-                out.write(s.push() ? 1 : 0);
-            }
-            case Ops.HistoryBack ignored -> {
-            }
-            case Ops.Bind b -> writeString(out, b.program());
-            case Ops.SetVar v -> {
+            case Ops.Var v -> {
                 writeString(out, v.name());
                 out.write(v.value());
                 out.write(v.value() >>> 8);
                 out.write(v.value() >>> 16);
                 out.write(v.value() >>> 24);
             }
-            case Ops.Navigate n -> writeString(out, n.href());
-            case Ops.Cookie c -> {
-                writeString(out, c.name());
-                writeString(out, c.value());
-            }
-            default -> {
-                // remove, focus, scroll, read_file: target element only
-            }
+            case Ops.Bind b -> writeString(out, b.program());
         }
+    }
+
+    private static String elOf(Ops.Op op) {
+        return switch (op) {
+            case Ops.Set s -> s.el();
+            case Ops.Call c -> c.el();
+            case Ops.Html h -> h.el();
+            case Ops.Del d -> d.el();
+            case Ops.Var ignored -> "";
+            case Ops.Bind b -> b.el();
+        };
     }
 
     private static void writeSubtree(ByteArrayOutputStream out, String html,
@@ -187,8 +147,6 @@ final class Wire {
     private static void writeString(ByteArrayOutputStream out, String s) {
         byte[] b = s.getBytes(StandardCharsets.UTF_8);
         if (b.length > 0xFFFF) {
-            // The length prefix is u16: letting it wrap silently corrupts the stream
-            // (the client applies a truncated subtree and misparses the rest).
             throw new IllegalArgumentException("wire string too long: " + b.length);
         }
         out.write(b.length);

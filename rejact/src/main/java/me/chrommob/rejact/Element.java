@@ -228,7 +228,9 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
                 classNames.add(name);
             }
             if (page != null) {
-                page.broadcast(Ops.classes(uid, List.of(name), List.of()));
+                for (Ops.Op op : Ops.classes(uid, List.of(name), List.of())) {
+                    page.broadcast(op);
+                }
             }
             return self();
         }
@@ -237,7 +239,9 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
     public S removeClass(String name) {
         synchronized (lock()) {
             if (classNames.remove(name) && page != null) {
-                page.broadcast(Ops.classes(uid, List.of(), List.of(name)));
+                for (Ops.Op op : Ops.classes(uid, List.of(), List.of(name))) {
+                    page.broadcast(op);
+                }
             }
             return self();
         }

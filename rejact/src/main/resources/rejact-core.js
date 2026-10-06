@@ -9,11 +9,8 @@ var ws;
 var el, uid, dv, u8;
 var enc = new TextEncoder();
 var dec = new TextDecoder();
-var EVN = [];
-function evname(code) {
-  if (!EVN.length) { for (var k in RJ_CODES) EVN[RJ_CODES[k]] = k; }
-  return EVN[code];
-}
+function evname(code) { return RJ_N[code - 1]; }
+function evcode(name) { return RJ_N.indexOf(name) + 1; }
 
 function frame(type, ev, uid, payload) {
   var p = enc.encode(JSON.stringify(payload || {}));
@@ -69,23 +66,23 @@ function attach(uid, el, def) {
       if (prevent.indexOf(ev) >= 0) e.preventDefault();
       var payload = {};
       try {
-        var spec = RJ_PULL[ev];
-        if (spec) {
-          for (var i = 0; i < spec.length; i++) {
-            var k = spec[i][0], t = spec[i][1], val = e[k];
-            payload[k] = t === 3 ? (val ? val.length | 0 : 0)
-              : t === 1 ? val | 0 : t === 2 ? !!val : t === 4 ? +val : val;
+        var s = RJ_PULL[ev];
+        if (s) {
+          if (typeof s === 'string') s = RJ_PULL[ev] = s.split(',');
+          for (var i = 0; i < s.length; i += 2) {
+            var k = s[i], t = +s[i + 1], v = e[k];
+            payload[k] = t === 3 ? (v ? v.length | 0 : 0) : t === 1 ? v | 0 : t === 2 ? !!v : v;
           }
         }
       } catch (err) {}
-      post(frame(2, RJ_CODES[ev] || 0, uid, vp(payload)));
+      post(frame(2, evcode(ev), uid, vp(payload)));
     });
   });
   if (el && 'value' in el && el.type !== 'file') {
     ['input', 'change'].forEach(function (ev) {
       if (events.indexOf(ev) < 0) {
         el.addEventListener(ev, function () {
-          post(frame(2, RJ_CODES[ev] || 0, uid,
+          post(frame(2, evcode(ev), uid,
               vp({ value: el.value, checked: !!el.checked })));
         });
       }
@@ -113,6 +110,7 @@ reg(document, cfg.subs || {});
 
 function dstr(o, w) {
   var n = w ? dv.getUint16(o, true) : dv.getUint8(o); o += w ? 2 : 1;
+  if (w && n === 0xffff) return [null, o];
   return [dec.decode(u8.subarray(o, o + n)), o + n];
 }
 function rstr(o) { return dstr(o, 0); }
@@ -132,96 +130,84 @@ function submap(o) {
   return [out, o];
 }
 
-var OPS = {
-  1: function (o) { var t = sstr(o); if (el) { purgeKids(el); el.textContent = t[0]; } delete BINDS[uid]; return t[1]; },
-  2: function (o) { var t = sstr(o); if (el) el.value = t[0]; return t[1]; },
-  3: function (o) {
-    var n = sstr(o); var len = dv.getUint16(n[1], true); o = n[1] + 2;
-    if (len === 0xffff) { if (el) el.removeAttribute(n[0]); return o; }
-    var v = dec.decode(u8.subarray(o, o + len)); o += len;
-    if (el) el.setAttribute(n[0], v);
+// Generic command interpreter: set(path) / call(method,args) / html / del / var / bind.
+// Paths: * = text content, @attr, #style, .class, else a property.
+function apply(o) {
+  var t = dv.getUint8(o); o += 1;
+  var r = rstr(o);
+  el = nodes[r[0]]; uid = r[0]; o = r[1];
+  if (t === 0) {
+    var p = sstr(o); var v = sstr(p[1]); o = v[1];
+    if (!el) return o;
+    var path = p[0], val = v[0];
+    if (path === '*') { purgeKids(el); el.textContent = val; delete BINDS[uid]; }
+    else if (path.charAt(0) === '@') {
+      var n = path.slice(1);
+      if (val === null) el.removeAttribute(n); else el.setAttribute(n, val);
+    } else if (path.charAt(0) === '#') el.style.setProperty(path.slice(1), val);
+    else if (path.charAt(0) === '.') {
+      if (val === null) el.classList.remove(path.slice(1));
+      else el.classList.add(path.slice(1));
+    } else el[path] = val;
     return o;
-  },
-  4: function (o) {
-    var p = sstr(o); var v = sstr(p[1]);
-    if (el) el.style.setProperty(p[0], v[0]);
-    return v[1];
-  },
-  5: function (o) {
-    var na = dv.getUint8(o); o += 1;
-    for (var i = 0; i < na; i++) { var t = sstr(o); o = t[1]; if (el) el.classList.add(t[0]); }
-    var nr = dv.getUint8(o); o += 1;
-    for (var j = 0; j < nr; j++) { var t2 = sstr(o); o = t2[1]; if (el) el.classList.remove(t2[0]); }
-    return o;
-  },
-  6: function (o) {
-    var h = sstr(o); o = h[1];
-    var sm = submap(o); o = sm[1];
+  }
+  if (t === 1) {
+    var rp = dv.getUint8(o); o += 1;
+    var h = sstr(o); var sm = submap(h[1]); o = sm[1];
     if (el) {
-      var scrollable = el.scrollHeight > el.clientHeight + 10;
-      var near = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
-      var prev = el.lastElementChild;
-      el.insertAdjacentHTML('beforeend', h[0]);
-      regNew(el, prev, sm[0]);
-      if (scrollable && near && el.lastElementChild) {
-        el.lastElementChild.scrollIntoView({ block: 'end' });
+      if (rp) { purgeKids(el); el.innerHTML = h[0]; regKids(el, sm[0]); }
+      else {
+        var scrollable = el.scrollHeight > el.clientHeight + 10;
+        var near = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+        var prev = el.lastElementChild;
+        el.insertAdjacentHTML('beforeend', h[0]);
+        regNew(el, prev, sm[0]);
+        if (scrollable && near && el.lastElementChild) el.lastElementChild.scrollIntoView({ block: 'end' });
       }
     }
     return o;
-  },
-  7: function (o) {
-    var h = sstr(o); o = h[1];
-    var sm = submap(o); o = sm[1];
-    if (el) { purgeKids(el); el.innerHTML = h[0]; regKids(el, sm[0]); }
+  }
+  if (t === 2) {
+    var m = sstr(o); var a = sstr(m[1]); o = a[1];
+    var name = m[0], args = JSON.parse(a[0] || '[]');
+    var dot = name.indexOf('.'), obj = el, fn = name;
+    if (dot > 0) { obj = el && el[name.slice(0, dot)]; fn = name.slice(dot + 1); }
+    if (obj && typeof obj[fn] === 'function') obj[fn].apply(obj, args);
+    else if (SYS[name]) SYS[name](args, el, uid);
     return o;
+  }
+  if (t === 3) { if (el) { purge(el); el.remove(); } return o; }
+  if (t === 4) { var vn = sstr(o); V[vn[0]] = [dv.getInt32(vn[1], true), Date.now()]; return vn[1] + 4; }
+  if (t === 5) {
+    var b = sstr(o); BINDS[uid] = JSON.parse(b[0]);
+    if (el) { purgeKids(el); el.textContent = ev(BINDS[uid]); }
+    timer(); return b[1];
+  }
+  return o;
+}
+
+// Host helpers (empty command target). DOM methods are preferred when the target has them.
+var SYS = {
+  navigate: function (a) { location.href = a[0]; },
+  cookie: function (a) { document.cookie = a[0] + '=' + E(a[1]) + '; Path=/; SameSite=Lax'; },
+  back: function () { history.back(); },
+  scrollTo: function (a) { window.scrollTo(a[0], a[1]); },
+  site: function (a) {
+    if (a[2]) history.pushState(null, '', '#' + E(a[0]) + '=' + E(a[1]));
+    document.documentElement.setAttribute('data-rj-site', a[0]);
   },
-  8: function (o) { if (el) { purge(el); el.remove(); } return o; },
-  9: function (o) { if (el) el.focus(); return o; },
-  10: function (o) { if (el) el.scrollIntoView({ block: 'end' }); return o; },
-  11: function (o) { var t = sstr(o); location.href = t[0]; return t[1]; },
-  12: function (o) {
-    var n = sstr(o); var v = sstr(n[1]);
-    document.cookie = n[0] + '=' + E(v[0]) + '; Path=/; SameSite=Lax';
-    return v[1];
-  },
-  13: function (o) {
-    var f = el && el.files && el.files[0];
+  readFile: function (a, node, id) {
+    var f = node && node.files && node.files[0];
     var meta = f
       ? JSON.stringify({ name: f.name, type: f.type, size: f.size, lastModified: f.lastModified })
       : JSON.stringify({ name: '', type: '', size: 0, lastModified: 0 });
-    fetch('/_rejact/upload?view=' + view + '&el=' + uid, {
+    fetch('/_rejact/upload?view=' + view + '&el=' + id, {
       method: 'POST',
       body: f || new Blob([]),
       headers: { 'X-Rj-Meta': E(meta) }
     });
-    return o;
-  },
-  14: function (o) { window.scrollTo(0, dv.getInt32(o, true)); return o + 4; },
-  15: function (o) {
-    var a = sstr(o); var b = sstr(a[1]);
-    if (dv.getUint8(b[1])) history.pushState(null, '', '#' + E(a[0]) + '=' + E(b[0]));
-    document.documentElement.setAttribute('data-rj-site', a[0]);
-    return b[1] + 1;
-  },
-  16: function (o) { history.back(); return o; },
-  17: function (o) {
-    var t = sstr(o); BINDS[uid] = JSON.parse(t[0]);
-    if (el) { purgeKids(el); el.textContent = ev(BINDS[uid]); }
-    timer();
-    return t[1];
-  },
-  18: function (o) {
-    var n = sstr(o); V[n[0]] = [dv.getInt32(n[1], true), Date.now()]; return n[1] + 4;
   }
 };
-
-function apply(o) {
-  var op = dv.getUint8(o); o += 1;
-  var r = rstr(o);
-  el = nodes[r[0]]; uid = r[0];
-  var fn = OPS[op];
-  return fn ? fn(r[1]) : r[1];
-}
 
 // ---- connection: backoff with jitter, offline badge, authoritative resync ----
 var retry = 0, badge = null, tick = 0;

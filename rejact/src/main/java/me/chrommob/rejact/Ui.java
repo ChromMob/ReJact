@@ -146,7 +146,7 @@ public final class Ui {
 
     /** Scrolls this tab's window to an absolute vertical offset. */
     public void scrollWindow(int y) {
-        view.send(new Ops.ScrollWindow(y));
+        view.send(Ops.scrollWindow(y));
     }
 
     /** Remembers a value for this tab only (one connection, gone when the tab closes). */
@@ -170,7 +170,7 @@ public final class Ui {
 
     /** Steps this tab one back through its own history; the previous site re-enters by itself. */
     public void back() {
-        view.send(new Ops.HistoryBack());
+        view.send(Ops.historyBack());
     }
 
     /** Sets a live variable on this tab only (see {@link Element#setVar} for the semantics). */
@@ -202,13 +202,13 @@ public final class Ui {
         view.attrs.put("rj.scroll." + site(), Integer.toString(eventScrollY));
         view.attrs.put("rj.site", name);
         view.page.enterSite(name, param);
-        view.send(new Ops.Site(name, param, fresh));
+        view.send(Ops.site(name, param, fresh));
         if (fresh) {
-            view.send(new Ops.ScrollWindow(0));
+            view.send(Ops.scrollWindow(0));
         } else {
             String y = view.attrs.get("rj.scroll." + name);
             if (y != null) {
-                view.send(new Ops.ScrollWindow(Integer.parseInt(y)));
+                view.send(Ops.scrollWindow(Integer.parseInt(y)));
             }
         }
     }

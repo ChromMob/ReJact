@@ -219,20 +219,17 @@ public final class SpecFromMdn {
         return "string";
     }
 
-    /** Compact data-driven JS extractor consumed by the generic puller in rejact-core.js. */
+    /** Compact "field,kind,…" table consumed by the generic puller in rejact-core.js. */
     private static String jsExtractor(List<Object> fields) {
         StringBuilder sb = new StringBuilder();
-        sb.append('[');
         for (int i = 0; i < fields.size(); i++) {
             Map<String, Object> f = Json.obj(fields.get(i));
             if (i > 0) {
                 sb.append(',');
             }
             String name = Json.str(f, "name");
-            sb.append("[").append(jsonStr(name)).append(',')
-                    .append(fieldKind(name, Json.str(f, "type"))).append(']');
+            sb.append(name).append(',').append(fieldKind(name, Json.str(f, "type")));
         }
-        sb.append(']');
         return sb.toString();
     }
 

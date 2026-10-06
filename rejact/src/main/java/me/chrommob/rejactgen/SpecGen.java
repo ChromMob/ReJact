@@ -233,30 +233,32 @@ public final class SpecGen {
 
     private static void writeBindings(Path resRoot, List<Object> events) throws IOException {
         StringBuilder sb = new StringBuilder(512);
-        // Data-driven pullers: one tiny table per event shape, shared by identical shapes.
+        // Compact pull tables: "field,kind,…" (0=str 1=int 2=bool 3=len 4=num). Identical
+        // shapes share one string; empty payloads are omitted (the puller no-ops).
         Map<String, String> vars = new LinkedHashMap<>();
         List<String> entries = new ArrayList<>();
         List<String> names = new ArrayList<>();
         for (Object o : events) {
             Map<String, Object> event = Json.obj(o);
+            String name = Json.str(event, "name");
+            names.add(name);
             String body = Json.str(event, "js");
+            if (body.isEmpty()) {
+                continue;
+            }
             String var = vars.get(body);
             if (var == null) {
                 var = "_" + vars.size();
                 vars.put(body, var);
+                sb.append("var ").append(var).append('=').append(jsonStr(body)).append(";\n");
             }
-            entries.add("  \"" + Json.str(event, "name") + "\":" + var);
-            names.add(Json.str(event, "name"));
+            entries.add(jsonStr(name) + ":" + var);
         }
-        for (Map.Entry<String, String> binding : vars.entrySet()) {
-            sb.append("var ").append(binding.getValue()).append('=').append(binding.getKey()).append(";\n");
-        }
-        sb.append("var RJ_PULL={\n");
-        sb.append(String.join(",", entries)).append("\n};\n");
-        // Compact name->code map: one string list, assigned on the client.
-        sb.append("var RJ_CODES={},RJ_N=");
+        sb.append("var RJ_PULL={");
+        sb.append(String.join(",", entries)).append("};\n");
+        // Name list doubles as the code table: code = indexOf(name)+1.
+        sb.append("var RJ_N=");
         sb.append(jsonStr(String.join(" ", names))).append(".split(' ');\n");
-        sb.append("for(var RJ_I=0;RJ_I<RJ_N.length;RJ_I++)RJ_CODES[RJ_N[RJ_I]]=RJ_I+1;\n");
         Files.createDirectories(resRoot);
         Files.writeString(resRoot.resolve("rejact-bindings.js"), sb.toString(), StandardCharsets.UTF_8);
     }
