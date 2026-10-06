@@ -15,7 +15,7 @@ val genOut = layout.buildDirectory.dir("generated/rejact")
 val genJava = genOut.map { it.dir("java") }
 val genBindings = genOut.map { it.file("resources/rejact-bindings.js") }
 val specgenClasses = layout.buildDirectory.dir("classes/java/specgen")
-val runtimeJs = layout.buildDirectory.dir("generated/runtime/rejact-runtime.js")
+val runtimeJs = layout.buildDirectory.file("generated/runtime/rejact-runtime.js")
 
 val compileSpecgen = tasks.register<JavaCompile>("compileSpecgen") {
     setSource(

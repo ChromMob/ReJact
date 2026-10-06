@@ -18,8 +18,7 @@ import me.chrommob.rejact.gen.tags.Title;
 /**
  * The smallest interesting ReJact v2 app: a live counter and a live greeting.
  * No JavaScript, no selectors, no ids. Java objects are the only currency.
- * Run: javac -cp build/classes -d build/classes examples/CounterExample.java
- *      java -cp build/classes:build/resources CounterExample 8092
+ * Run: ./gradlew :demos:run --args='8092'  (or main of this class on the :demos classpath)
  */
 public final class CounterExample {
     public static void main(String[] args) throws Exception {

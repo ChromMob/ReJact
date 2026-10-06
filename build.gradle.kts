@@ -1,7 +1,3 @@
-plugins {
-    java
-}
-
 group = "me.chrommob"
 version = "1.0-SNAPSHOT"
 
