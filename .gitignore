@@ -46,3 +46,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Maven consumer verification and browser tests
+**/target/
+**/node_modules/

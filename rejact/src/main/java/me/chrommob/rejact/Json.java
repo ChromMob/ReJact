@@ -28,8 +28,10 @@ public final class Json {
         } else if (v instanceof Boolean b) {
             sb.append(b.booleanValue());
         } else if (v instanceof Double d) {
+            if (!Double.isFinite(d)) throw new IllegalArgumentException("non-finite JSON number");
             sb.append(d.doubleValue());
         } else if (v instanceof Float f) {
+            if (!Float.isFinite(f)) throw new IllegalArgumentException("non-finite JSON number");
             sb.append(f.doubleValue());
         } else if (v instanceof Number n) {
             sb.append(n.longValue());
@@ -86,7 +88,11 @@ public final class Json {
     // ---------- parser ----------
 
     public static Object parse(String text) {
-        return new Parser(text).parseValue();
+        Parser parser = new Parser(java.util.Objects.requireNonNull(text, "text"));
+        Object value = parser.parseValue();
+        parser.skipWs();
+        if (parser.pos != text.length()) throw new IllegalArgumentException("trailing JSON input");
+        return value;
     }
 
     @SuppressWarnings("unchecked")
@@ -117,6 +123,7 @@ public final class Json {
     private static final class Parser {
         private final String s;
         private int pos;
+        private int depth;
 
         Parser(String s) {
             this.s = s;
@@ -124,17 +131,22 @@ public final class Json {
 
         Object parseValue() {
             skipWs();
-            if (pos >= s.length()) return null;
+            if (pos >= s.length()) throw new IllegalArgumentException("unexpected end of JSON");
+            if (++depth > 64) throw new IllegalArgumentException("JSON nesting exceeds 64 levels");
             char c = s.charAt(pos);
-            return switch (c) {
-                case '{' -> parseObject();
-                case '[' -> parseArray();
-                case '"' -> parseString();
-                case 't' -> parseLiteral("true", Boolean.TRUE);
-                case 'f' -> parseLiteral("false", Boolean.FALSE);
-                case 'n' -> parseLiteral("null", null);
-                default -> parseNumber();
-            };
+            try {
+                return switch (c) {
+                    case '{' -> parseObject();
+                    case '[' -> parseArray();
+                    case '"' -> parseString();
+                    case 't' -> parseLiteral("true", Boolean.TRUE);
+                    case 'f' -> parseLiteral("false", Boolean.FALSE);
+                    case 'n' -> parseLiteral("null", null);
+                    default -> parseNumber();
+                };
+            } finally {
+                depth--;
+            }
         }
 
         private Object parseLiteral(String lit, Object value) {
@@ -187,7 +199,7 @@ public final class Json {
         }
 
         private String parseString() {
-            if (s.charAt(pos) != '"') throw new IllegalArgumentException("expected string at " + pos);
+            if (pos >= s.length() || s.charAt(pos) != '"') throw new IllegalArgumentException("expected string at " + pos);
             pos++;
             StringBuilder sb = new StringBuilder();
             while (pos < s.length()) {
@@ -206,12 +218,14 @@ public final class Json {
                         case 'b' -> sb.append('\b');
                         case 'f' -> sb.append('\f');
                         case 'u' -> {
+                            if (pos + 4 > s.length()) throw new IllegalArgumentException("short unicode escape");
                             sb.append((char) Integer.parseInt(s.substring(pos, pos + 4), 16));
                             pos += 4;
                         }
                         default -> throw new IllegalArgumentException("bad escape \\" + e);
                     }
                 } else {
+                    if (c < 0x20) throw new IllegalArgumentException("unescaped control character");
                     sb.append(c);
                 }
             }
@@ -222,12 +236,19 @@ public final class Json {
             int start = pos;
             while (pos < s.length() && "+-0123456789.eE".indexOf(s.charAt(pos)) >= 0) pos++;
             String n = s.substring(start, pos);
-            if (n.contains(".") || n.contains("e") || n.contains("E")) return Double.parseDouble(n);
+            if (!n.matches("-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+-]?[0-9]+)?")) {
+                throw new IllegalArgumentException("invalid JSON number");
+            }
+            if (n.contains(".") || n.contains("e") || n.contains("E")) {
+                double value = Double.parseDouble(n);
+                if (!Double.isFinite(value)) throw new IllegalArgumentException("non-finite JSON number");
+                return value;
+            }
             return Long.parseLong(n);
         }
 
         private void skipWs() {
-            while (pos < s.length() && Character.isWhitespace(s.charAt(pos))) pos++;
+            while (pos < s.length() && " \t\r\n".indexOf(s.charAt(pos)) >= 0) pos++;
         }
     }
 }

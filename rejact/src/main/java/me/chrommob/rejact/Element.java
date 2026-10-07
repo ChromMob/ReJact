@@ -85,6 +85,7 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
     // ---------- structure ----------
     public S add(Element<?>... kids) {
         synchronized (lock()) {
+            validateChildren(kids, false);
             for (Element<?> kid : kids) {
                 kid.parent = this;
                 children.add(kid);
@@ -99,6 +100,7 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
 
     public S replaceChildren(Element<?>... kids) {
         synchronized (lock()) {
+            validateChildren(kids, true);
             for (Object child : children) {
                 if (child instanceof Element<?> e) {
                     e.unmount();
@@ -114,6 +116,20 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
                 page.broadcast(Ops.replace(uid, renderAll(kids), collectSubs(kids)));
             }
             return self();
+        }
+    }
+
+    private void validateChildren(Element<?>[] kids, boolean replacing) {
+        java.util.Set<Element<?>> seen = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        for (Element<?> kid : kids) {
+            java.util.Objects.requireNonNull(kid, "child");
+            if (!seen.add(kid) || (kid.parent != null && !(replacing && kid.parent == this))
+                    || (kid.parent == null && kid.page != null)) {
+                throw new IllegalArgumentException("an element can belong to only one parent");
+            }
+            for (Element<?> ancestor = this; ancestor != null; ancestor = ancestor.parent) {
+                if (ancestor == kid) throw new IllegalArgumentException("element trees cannot contain cycles");
+            }
         }
     }
 
@@ -290,15 +306,15 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
     }
 
     void unmount() {
-        if (page != null) {
-            page.unregister(this);
-        }
-        page = null;
+        unmountTree();
         parent = null;
+    }
+
+    private void unmountTree() {
+        if (page != null) page.unregister(this);
+        page = null;
         for (Object child : children) {
-            if (child instanceof Element<?> e) {
-                e.unmount();
-            }
+            if (child instanceof Element<?> element) element.unmountTree();
         }
     }
 

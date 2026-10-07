@@ -20,7 +20,7 @@ final class Ws {
     static final int OP_CLOSE = 0x8;
     static final int OP_PING = 0x9;
     static final int OP_PONG = 0xA;
-    private static final int MAX_FRAME = 8 * 1024 * 1024;
+    static final int MAX_FRAME = 256 * 1024;
 
     /** Wire accounting for /_rejact/stats: application payload bytes and message counts. */
     static final AtomicLong BYTES_IN = new AtomicLong();
@@ -71,23 +71,32 @@ final class Ws {
 
     static Frame read(InputStream in) throws IOException {
         int b0 = in.read();
-        int b1 = in.read();
-        if (b0 < 0 || b1 < 0) {
-            return null;
-        }
+        if (b0 < 0) return null;
+        int b1 = readByte(in);
         boolean fin = (b0 & 0x80) != 0;
         int opcode = b0 & 0x0F;
         boolean masked = (b1 & 0x80) != 0;
+        if (!masked || (b0 & 0x70) != 0
+                || (opcode != OP_CONT && opcode != OP_TEXT && opcode != OP_BINARY
+                    && opcode != OP_CLOSE && opcode != OP_PING && opcode != OP_PONG)) {
+            throw new IOException("invalid client frame");
+        }
         long len = b1 & 0x7F;
+        if (opcode >= OP_CLOSE && (!fin || len > 125)) {
+            throw new IOException("invalid control frame");
+        }
         if (len == 126) {
-            len = ((long) in.read() << 8) | in.read();
+            len = ((long) readByte(in) << 8) | readByte(in);
+            if (len < 126) throw new IOException("non-canonical frame length");
         } else if (len == 127) {
             len = 0;
             for (int i = 0; i < 8; i++) {
-                len = (len << 8) | in.read();
+                len = (len << 8) | readByte(in);
             }
         }
-        if (len > MAX_FRAME) {
+        if ((b1 & 0x7f) == 127 && len < 65536) throw new IOException("invalid extended frame length");
+        if (opcode == OP_CLOSE && len == 1) throw new IOException("invalid close frame");
+        if (len < 0 || len > MAX_FRAME) {
             throw new IOException("ws frame too large: " + len);
         }
         byte[] mask = new byte[4];
@@ -104,6 +113,12 @@ final class Ws {
             }
         }
         return new Frame(fin, opcode, payload);
+    }
+
+    private static int readByte(InputStream in) throws IOException {
+        int value = in.read();
+        if (value < 0) throw new IOException("stream closed mid-frame");
+        return value;
     }
 
     private static void readFully(InputStream in, byte[] buf) throws IOException {

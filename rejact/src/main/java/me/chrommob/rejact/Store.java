@@ -62,8 +62,10 @@ public final class Store {
     }
 
     private static String safe(String name) {
-        String s = name == null ? "" : name.replaceAll("[^a-zA-Z0-9_-]", "");
-        return s.isEmpty() ? "anon" : s;
+        if (name == null || !name.matches("[a-zA-Z0-9_.-]{1,128}")) {
+            throw new IllegalArgumentException("store names must contain 1-128 letters, digits, _, . or -");
+        }
+        return name;
     }
 
     /** A file-backed string map. Lists are newline-joined; numbers are stored as strings. */
@@ -79,12 +81,19 @@ public final class Store {
         private void load() {
             try {
                 if (Files.exists(file)) {
-                    for (Map.Entry<String, Object> e : Json.obj(Json.parse(Files.readString(file))).entrySet()) {
-                        map.put(e.getKey(), String.valueOf(e.getValue()));
+                    Object parsed = Json.parse(Files.readString(file));
+                    if (!(parsed instanceof Map<?, ?> values)) {
+                        throw new IllegalArgumentException("store must contain a JSON object");
+                    }
+                    for (Map.Entry<?, ?> e : values.entrySet()) {
+                        if (!(e.getKey() instanceof String key) || !(e.getValue() instanceof String value)) {
+                            throw new IllegalArgumentException("store values must be strings");
+                        }
+                        map.put(key, value);
                     }
                 }
             } catch (Exception e) {
-                // A corrupt file must not take the app down: start empty, the next persist() heals it.
+                throw new IllegalStateException("cannot load " + file, e);
             }
         }
 
@@ -119,8 +128,11 @@ public final class Store {
         }
 
         public synchronized Kv set(String key, String value) {
-            map.put(key, value);
-            persist();
+            java.util.Objects.requireNonNull(key, "key");
+            java.util.Objects.requireNonNull(value, "value");
+            Map<String, String> next = new LinkedHashMap<>(map);
+            next.put(key, value);
+            persist(next);
             return this;
         }
 
@@ -137,29 +149,34 @@ public final class Store {
         }
 
         public synchronized Kv remove(String key) {
-            if (map.remove(key) != null) {
-                persist();
+            if (map.containsKey(key)) {
+                Map<String, String> next = new LinkedHashMap<>(map);
+                next.remove(key);
+                persist(next);
             }
             return this;
         }
 
         /** Copies every key of {@code other} into this store (e.g. session state adopting an account). */
-        public synchronized void adopt(Kv other) {
+        public void adopt(Kv other) {
+            Map<String, String> snapshot;
             synchronized (other) {
-                if (other.map.isEmpty()) {
-                    return;
-                }
-                map.putAll(other.map);
-                persist();
+                snapshot = new LinkedHashMap<>(other.map);
+            }
+            synchronized (this) {
+                if (snapshot.isEmpty()) return;
+                Map<String, String> next = new LinkedHashMap<>(map);
+                next.putAll(snapshot);
+                persist(next);
             }
         }
 
         /** Write-through: the mutation is on disk before this returns. */
-        private void persist() {
+        private void persist(Map<String, String> next) {
             try {
                 Files.createDirectories(file.getParent());
                 Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
-                Files.writeString(tmp, Json.write(map), StandardCharsets.UTF_8,
+                Files.writeString(tmp, Json.write(next), StandardCharsets.UTF_8,
                         StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                 try {
                     Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING,
@@ -170,6 +187,8 @@ public final class Store {
             } catch (IOException e) {
                 throw new IllegalStateException("cannot persist " + file, e);
             }
+            map.clear();
+            map.putAll(next);
         }
     }
 }

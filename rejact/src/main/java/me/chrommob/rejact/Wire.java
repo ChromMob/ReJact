@@ -43,7 +43,7 @@ final class Wire {
     }
 
     static Inbound decode(byte[] frame) {
-        if (frame.length < 4) {
+        if (frame.length < 5) {
             throw new IllegalArgumentException("short frame");
         }
         int type = frame[0] & 0xFF;
@@ -51,11 +51,14 @@ final class Wire {
         int o = 2;
         int elLen = frame[o] & 0xFF;
         o += 1;
+        if (o + elLen + 2 > frame.length) {
+            throw new IllegalArgumentException("element overflow");
+        }
         String el = new String(frame, o, elLen, StandardCharsets.UTF_8);
         o += elLen;
         int plen = (frame[o] & 0xFF) | ((frame[o + 1] & 0xFF) << 8);
         o += 2;
-        if (o + plen > frame.length) {
+        if (o + plen != frame.length) {
             throw new IllegalArgumentException("payload overflow");
         }
         Map<String, Object> payload = plen == 0 ? new java.util.LinkedHashMap<>()
@@ -124,6 +127,9 @@ final class Wire {
     private static void writeSubtree(ByteArrayOutputStream out, String html,
             Map<String, List<Ops.EvSub>> subs) {
         writeString(out, html);
+        if (subs.size() > 255 || subs.values().stream().anyMatch(events -> events.size() > 255)) {
+            throw new IllegalArgumentException("too many event subscriptions");
+        }
         out.write(subs.size());
         for (Map.Entry<String, List<Ops.EvSub>> e : subs.entrySet()) {
             writeShort(out, e.getKey());
@@ -146,7 +152,7 @@ final class Wire {
 
     private static void writeString(ByteArrayOutputStream out, String s) {
         byte[] b = s.getBytes(StandardCharsets.UTF_8);
-        if (b.length > 0xFFFF) {
+        if (b.length >= NULL_STR) {
             throw new IllegalArgumentException("wire string too long: " + b.length);
         }
         out.write(b.length);

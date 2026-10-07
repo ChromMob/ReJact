@@ -1,8 +1,6 @@
 package me.chrommob.rejact;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Set;
@@ -16,7 +14,7 @@ import javax.crypto.spec.PBEKeySpec;
  * {@code user:<name>} key of the shared {@code accounts} app store.
  */
 public final class Accounts {
-    private static final int ITERATIONS = 210_000;
+    private static final int ITERATIONS = 600_000;
     private static final int SALT_BYTES = 16;
     private static final int HASH_BYTES = 32;
 
@@ -30,7 +28,7 @@ public final class Accounts {
     /** Registers a new account. Returns false when the name is taken or the input is unusable. */
     public synchronized boolean register(String name, String password) {
         String user = clean(name);
-        if (user.isEmpty() || password.length() < 4 || has(user)) {
+        if (user.isEmpty() || password == null || password.length() < 8 || password.length() > 1024 || has(user)) {
             return false;
         }
         byte[] salt = new byte[SALT_BYTES];
@@ -46,7 +44,7 @@ public final class Accounts {
     /** Constant-time credential check. No error detail on purpose: it must not leak which exists. */
     public boolean verify(String name, String password) {
         String user = clean(name);
-        if (user.isEmpty()) {
+        if (user.isEmpty() || password == null || password.length() > 1024) {
             return false;
         }
         String record = store.get("user:" + user, "");
@@ -57,9 +55,12 @@ public final class Accounts {
         }
         try {
             String[] parts = record.split("\\.");
+            if (parts.length != 3) return false;
             int iterations = Integer.parseInt(parts[0]);
+            if (iterations < 1 || iterations > 2_000_000) return false;
             byte[] salt = Base64.getDecoder().decode(parts[1]);
             byte[] expected = Base64.getDecoder().decode(parts[2]);
+            if (salt.length != SALT_BYTES || expected.length != HASH_BYTES) return false;
             byte[] actual = pbkdf2(password, salt, iterations);
             return MessageDigest.isEqual(expected, actual);
         } catch (RuntimeException e) {
@@ -90,7 +91,11 @@ public final class Accounts {
     private static byte[] pbkdf2(String password, byte[] salt, int iterations) {
         try {
             PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, HASH_BYTES * 8);
-            return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).getEncoded();
+            try {
+                return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).getEncoded();
+            } finally {
+                spec.clearPassword();
+            }
         } catch (Exception e) {
             throw new IllegalStateException("PBKDF2 unavailable", e);
         }

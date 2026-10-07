@@ -15,6 +15,7 @@ function evcode(name) { return RJ_N.indexOf(name) + 1; }
 function frame(type, ev, uid, payload) {
   var p = enc.encode(JSON.stringify(payload || {}));
   var u = enc.encode(uid || '');
+  if (u.length > 255 || p.length > 65535) throw new RangeError('ReJact event exceeds wire limits');
   var buf = new Uint8Array(5 + u.length + p.length);
   var dv = new DataView(buf.buffer);
   buf[0] = type; buf[1] = ev; buf[2] = u.length;
@@ -227,8 +228,7 @@ function dot(on) {
 function connect() {
   ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://')
     + location.host + '/_rejact/ws?view=' + view
-    + '&path=' + encodeURIComponent(cfg.path)
-    + '&sid=' + encodeURIComponent(cfg.sid || ''));
+    + '&path=' + encodeURIComponent(cfg.path));
   ws.binaryType = 'arraybuffer';
   ws.onopen = function () {
     var re = retry;

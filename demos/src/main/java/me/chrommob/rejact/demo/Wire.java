@@ -454,7 +454,7 @@ public final class Wire {
                 view.headline.text("welcome, " + view.person.user);
                 renderAll(view);
             } else {
-                view.headline.text("name taken, bad format, or password under 4 chars");
+                view.headline.text("name taken, bad format, or password outside 8-1024 chars");
             }
         });
         view.accountBox.replaceChildren(

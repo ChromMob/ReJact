@@ -16,3 +16,10 @@ tasks.jar {
         attributes["Main-Class"] = "me.chrommob.rejact.demo.Examples"
     }
 }
+
+tasks.register<JavaExec>("runCounter") {
+    group = "application"
+    description = "Run the counter example on port 8092"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("me.chrommob.rejact.examples.CounterExample")
+}

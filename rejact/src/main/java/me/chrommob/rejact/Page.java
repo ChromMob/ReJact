@@ -7,8 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -19,11 +17,17 @@ import me.chrommob.rejact.gen.tags.Html;
  * mutations broadcast to every connected view, handlers run per view via {@link Ui}.
  */
 public final class Page {
-    private static final ScheduledExecutorService TIMERS = Executors.newSingleThreadScheduledExecutor(r -> {
-        Thread t = new Thread(r, "rejact-timers");
-        t.setDaemon(true);
-        return t;
-    });
+    private static final java.util.concurrent.ScheduledThreadPoolExecutor TIMERS =
+            new java.util.concurrent.ScheduledThreadPoolExecutor(1, r -> {
+                Thread thread = new Thread(r, "rejact-timers");
+                thread.setDaemon(true);
+                return thread;
+            });
+    static { TIMERS.setRemoveOnCancelPolicy(true); }
+
+    private record Timer(long millis, Consumer<Ui> action) { }
+    private final List<Timer> timers = new ArrayList<>();
+    private final List<java.util.concurrent.ScheduledFuture<?>> scheduled = new ArrayList<>();
 
     private String path;
 
@@ -96,18 +100,27 @@ public final class Page {
     }
 
     /** Runs the action for every connected view on a fixed schedule. */
-    public Page every(Duration period, Consumer<Ui> action) {
-        long ms = period.toMillis();
-        TIMERS.scheduleAtFixedRate(() -> {
-            for (View view : views.values()) {
-                try {
-                    action.accept(new Ui(view, view.cookies));
-                } catch (Exception e) {
-                    e.printStackTrace();
+    public synchronized Page every(Duration period, Consumer<Ui> action) {
+        long millis = period.toMillis();
+        if (millis < 1) throw new IllegalArgumentException("timer period must be at least one millisecond");
+        Timer timer = new Timer(millis, java.util.Objects.requireNonNull(action, "action"));
+        timers.add(timer);
+        if (!views.isEmpty()) schedule(timer);
+        return this;
+    }
+
+    private void schedule(Timer timer) {
+        scheduled.add(TIMERS.scheduleAtFixedRate(() -> {
+            synchronized (this) {
+                for (View view : views.values()) {
+                    try {
+                        timer.action().accept(new Ui(view, view.cookies));
+                    } catch (Exception e) {
+                        System.getLogger(Page.class.getName()).log(System.Logger.Level.WARNING, "timer failed", e);
+                    }
                 }
             }
-        }, ms, ms, TimeUnit.MILLISECONDS);
-        return this;
+        }, timer.millis(), timer.millis(), TimeUnit.MILLISECONDS));
     }
 
     /** One {@link Ui} per connected view of this page. */
@@ -126,7 +139,6 @@ public final class Page {
         synchronized (this) {
             Map<String, Object> cfg = new LinkedHashMap<>();
             cfg.put("path", path);
-            cfg.put("sid", sessionKey == null ? "" : sessionKey);
             cfg.put("subs", subsJson(tree.collectSubs()));
             StringBuilder sb = new StringBuilder(2048);
             sb.append("<!doctype html>");
@@ -188,20 +200,35 @@ public final class Page {
         }
     }
 
-    void attach(View view) {
+    synchronized void attach(View view) {
+        if (!view.alive) return;
+        boolean first = views.isEmpty();
         views.put(view.id, view);
+        if (first) timers.forEach(this::schedule);
     }
 
-    void detach(View view) {
+    synchronized void detach(View view) {
         views.remove(view.id, view);
+        if (views.isEmpty()) {
+            scheduled.forEach(task -> task.cancel(false));
+            scheduled.clear();
+        }
     }
 
     void register(Element<?> element) {
         registry.put(element.uid(), element);
     }
 
+    boolean containsElement(String uid) {
+        return registry.containsKey(uid);
+    }
+
     void unregister(Element<?> element) {
         registry.remove(element.uid());
+        for (View view : views.values()) {
+            view.values.remove(element.uid());
+            view.fileHandlers.remove(element.uid());
+        }
     }
 
     /** Keeps every view's input-value cache in sync when the server sets a value itself. */

@@ -1,4 +1,21 @@
-import java.io.File
+plugins {
+    `java-library`
+    `maven-publish`
+    signing
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+dependencies {
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test { useJUnitPlatform() }
 
 // ReJact v2 framework. Zero third-party dependencies.
 //
@@ -11,7 +28,6 @@ import java.io.File
 val htmlRef = layout.projectDirectory.file("spec/mdn/html.json")
 val overlayFile = layout.projectDirectory.file("spec/overlay.json")
 val coreJs = layout.projectDirectory.file("src/main/resources/rejact-core.js")
-val squeezePy = layout.projectDirectory.file("tools/squeeze.py")
 
 val generatedSpec = layout.buildDirectory.file("generated/spec/elements.json")
 val genOut = layout.buildDirectory.dir("generated/rejact")
@@ -77,36 +93,9 @@ val assembleRuntime = tasks.register("assembleRuntime") {
         val raw = coreJs.asFile.readText(Charsets.UTF_8) +
             "\n" +
             bindings.get().asFile.readText(Charsets.UTF_8)
-        val pathDirs = System.getenv("PATH").orEmpty().split(File.pathSeparator)
-        val esbuild = System.getenv("ESBUILD")?.let(::File)
-            ?: (pathDirs.map { File(it, "esbuild") } +
-                File(System.getProperty("user.home"), ".hermes/hermes-agent/node_modules/.bin/esbuild"))
-                .firstOrNull { it.canExecute() }
-
         val outFile = out.get().asFile
         outFile.parentFile.mkdirs()
-
-        fun compact(cmd: List<String>): Boolean {
-            val tmp = File.createTempFile("rejact-runtime", ".js")
-            return try {
-                tmp.writeText(raw)
-                ProcessBuilder(cmd)
-                    .redirectInput(tmp)
-                    .redirectOutput(outFile)
-                    .redirectError(ProcessBuilder.Redirect.INHERIT)
-                    .start()
-                    .waitFor() == 0 && outFile.length() > 0L
-            } catch (_: java.io.IOException) {
-                false
-            } finally {
-                tmp.delete()
-            }
-        }
-
-        val ok = (esbuild != null && compact(listOf(esbuild.absolutePath, "--minify", "--loader=js"))) ||
-            compact(listOf("npx", "--yes", "esbuild", "--minify", "--loader=js")) ||
-            compact(listOf("python3", squeezePy.asFile.absolutePath))
-        if (!ok) outFile.writeText(raw)
+        outFile.writeText(raw, Charsets.UTF_8)
         logger.lifecycle("rejact-runtime.js ${outFile.length()} bytes")
     }
 }
@@ -114,6 +103,7 @@ val assembleRuntime = tasks.register("assembleRuntime") {
 sourceSets {
     main {
         java.srcDir(genJava)
+        java.exclude("me/chrommob/rejactgen/**")
     }
 }
 
@@ -126,4 +116,105 @@ tasks.named<ProcessResources>("processResources") {
     from(runtimeJs)
     // rejact-core.js is a build input only; the shipped artifact is the assembled runtime.
     exclude("rejact-core.js")
+}
+
+// Sources and API docs must include the generated public tag/event classes.
+tasks.named("sourcesJar") { dependsOn(generateRejact) }
+tasks.javadoc {
+    dependsOn(generateRejact)
+    (options as StandardJavadocDocletOptions).apply {
+        encoding = "UTF-8"
+        isNoTimestamp = true
+        addStringOption("Xdoclint:all,-missing", "-quiet")
+    }
+}
+tasks.withType<Jar>().configureEach {
+    from(rootProject.file("LICENSE")) { into("META-INF") }
+    from("spec/mdn/LICENSE") { into("META-INF"); rename { "LICENSE-MDN" } }
+}
+tasks.jar {
+    manifest.attributes["Automatic-Module-Name"] = "me.chrommob.rejact"
+    manifest.attributes["Implementation-Version"] = project.version
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "rejact"
+            pom {
+                name.set("ReJact")
+                description.set("Server-rendered reactive web applications in Java")
+                url.set("https://github.com/chrommob/rejact")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/license/mit")
+                        distribution.set("repo")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("chrommob")
+                        name.set("ChromMob")
+                        url.set("https://github.com/chrommob")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:https://github.com/chrommob/rejact.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/chrommob/rejact.git")
+                    url.set("https://github.com/chrommob/rejact")
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "staging"
+            url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
+        }
+        providers.gradleProperty("publishUrl").orNull?.let { target ->
+            maven {
+                name = "release"
+                url = uri(target)
+                credentials {
+                    username = providers.environmentVariable("MAVEN_USERNAME").orNull
+                    password = providers.environmentVariable("MAVEN_PASSWORD").orNull
+                }
+            }
+        }
+    }
+}
+
+val signingKey = providers.environmentVariable("SIGNING_KEY")
+signing {
+    isRequired = providers.gradleProperty("requireSigning").map(String::toBoolean).getOrElse(false)
+    if (signingKey.isPresent) {
+        useInMemoryPgpKeys(signingKey.get(), providers.environmentVariable("SIGNING_PASSWORD").orNull)
+    }
+    sign(publishing.publications["mavenJava"])
+}
+
+// Only this version's files belong in a Central Portal bundle; omit repository metadata.
+tasks.register<Zip>("centralBundle") {
+    group = "publishing"
+    description = "Build a signed deployment bundle for the Maven Central Portal"
+    dependsOn("check", "publishMavenJavaPublicationToStagingRepository")
+    val releaseVersion = project.version.toString()
+    val coordinatePath = "${project.group.toString().replace('.', '/')}/rejact/$releaseVersion"
+    val staging = layout.buildDirectory.dir("staging-deploy")
+    from(staging) { include("$coordinatePath/**") }
+    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+    archiveFileName.set("rejact-${project.version}-central.zip")
+    doFirst {
+        check(signingKey.isPresent) { "Set SIGNING_KEY to prepare a signed Central bundle" }
+        check(!releaseVersion.endsWith("SNAPSHOT")) { "Central requires a releaseVersion without SNAPSHOT" }
+        val directory = staging.get().dir(coordinatePath).asFile
+        for (suffix in listOf(".jar", "-sources.jar", "-javadoc.jar", ".pom", ".module")) {
+            val artifact = directory.resolve("rejact-$releaseVersion$suffix")
+            check(artifact.isFile && artifact.resolveSibling(artifact.name + ".asc").isFile) {
+                "Missing artifact or signature for ${artifact.name}; set SIGNING_KEY and SIGNING_PASSWORD"
+            }
+        }
+    }
 }

@@ -60,9 +60,13 @@ public final class View {
     }
 
     void close() {
-        if (alive) {
-            alive = false;
-            page.detach(this);
+        synchronized (page) {
+            if (alive) {
+                alive = false;
+                fileHandlers.clear();
+                page.detach(this);
+                try { out.close(); } catch (IOException ignored) { }
+            }
         }
     }
 
