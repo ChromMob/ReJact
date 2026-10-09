@@ -200,6 +200,18 @@ var SYS = {
     if (a[2]) history.pushState(null, '', '#' + E(a[0]) + '=' + E(a[1]));
     document.documentElement.setAttribute('data-rj-site', a[0]);
   },
+  // Reorder children to the given uid sequence by moving nodes, never re-creating them, so
+  // focus, selection, scroll and running transitions all survive a sort.
+  'rj.order': function (a, node) {
+    if (!node) return;
+    var at = node.firstChild;
+    for (var i = 0; i < a.length; i++) {
+      var child = nodes[a[i]];
+      if (!child || child.parentNode !== node) continue;
+      if (child === at) { at = at.nextSibling; continue; }
+      node.insertBefore(child, at);
+    }
+  },
   readFile: function (a, node, id) {
     var f = node && node.files && node.files[0];
     var meta = f

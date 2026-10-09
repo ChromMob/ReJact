@@ -131,6 +131,19 @@ public final class Ops {
         return new Del(el);
     }
 
+    /**
+     * Reorders the children of {@code el} to match {@code childUids}, moving the existing nodes.
+     *
+     * <p>The alternative is re-rendering the list, which is how sorting a fifty-row table came to
+     * cost thirty kilobytes of HTML to say nothing new. This says it in a few hundred bytes, and
+     * because the nodes move rather than being replaced, the browser keeps their focus, scroll
+     * position, text selection and in-flight CSS transitions. Children not named are left after
+     * the named ones, in their existing order.
+     */
+    public static Call order(String el, List<String> childUids) {
+        return new Call(el, "rj.order", jsonArray(childUids));
+    }
+
     public static Call focus(String el) {
         return new Call(el, "focus", "[]");
     }

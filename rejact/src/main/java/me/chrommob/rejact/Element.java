@@ -82,6 +82,11 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
         return tag;
     }
 
+    /** This element's current parent, or null when it is not mounted under one. */
+    public Element<?> parentElement() {
+        return parent;
+    }
+
     // ---------- structure ----------
     public S add(Element<?>... kids) {
         synchronized (lock()) {
@@ -130,6 +135,45 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
             for (Element<?> ancestor = this; ancestor != null; ancestor = ancestor.parent) {
                 if (ancestor == kid) throw new IllegalArgumentException("element trees cannot contain cycles");
             }
+        }
+    }
+
+    /**
+     * Reorders existing children to the given sequence, moving nodes instead of re-rendering them.
+     *
+     * <p>Use this for sorting, grouping and filtering a list whose rows already exist: it costs a
+     * handful of bytes per row rather than a row's worth of HTML, and the browser keeps each row's
+     * focus, selection and scroll state because the nodes are the same nodes. Children omitted
+     * from {@code order} keep their relative order after the ones named. Elements that are not
+     * children of this one are ignored.
+     */
+    public S orderChildren(List<? extends Element<?>> order) {
+        synchronized (lock()) {
+            List<String> uids = new ArrayList<>(order.size());
+            List<Object> moved = new ArrayList<>(children.size());
+            java.util.Set<Element<?>> named =
+                    java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+            for (Element<?> kid : order) {
+                if (kid != null && kid.parent == this && named.add(kid)) {
+                    moved.add(kid);
+                    uids.add(kid.uid());
+                }
+            }
+            for (Object child : children) {
+                if (!(child instanceof Element<?> e) || !named.contains(e)) {
+                    moved.add(child);
+                }
+            }
+            // Reordering to the order they are already in is a no-op the caller should not have
+            // to detect: this runs on every repaint, and an op per repaint is exactly the kind
+            // of traffic the batch is meant to remove.
+            boolean unchanged = children.equals(moved);
+            children.clear();
+            children.addAll(moved);
+            if (page != null && !uids.isEmpty() && !unchanged) {
+                page.broadcast(Ops.order(uid, uids));
+            }
+            return self();
         }
     }
 
