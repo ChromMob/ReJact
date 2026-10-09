@@ -15,7 +15,7 @@ import me.chrommob.rejact.gen.EventCodes;
  * <p>Client to server (one frame per message):
  *
  * <pre>
- *   [type: u8][ev: u8][el: u8 len + bytes][payload len: u16 LE][payload JSON, UTF-8]
+ *   [type: u8][ev: u8][el: u8 len + bytes][payload len: u32 LE][payload JSON, UTF-8]
  *   type 1 = page load (payload {"v": {uid: value}} — the one-time values sync)
  *   type 2 = event (ev = generated event code, payload = typed event fields)
  *   type 3 = page unload
@@ -24,8 +24,9 @@ import me.chrommob.rejact.gen.EventCodes;
  * <p>Server to client (one frame per command batch):
  *
  * <pre>
- *   [0xB1][count: u8][cmd...]  cmd = [kind: u8][el: u8 len + bytes][args per kind]
- *   strings are [u16 LE len + UTF-8 bytes]; null values are u16 0xFFFF.
+ *   [0xB2][count: u8][cmd...]  cmd = [kind: u8][el: u8 len + bytes][args per kind]
+ *   strings are [u32 LE len + UTF-8 bytes]; null values are u32 0xFFFFFFFF.
+ *   HTML subscription element counts are u32; event counts remain u8.
  * </pre>
  */
 final class Wire {
@@ -33,8 +34,11 @@ final class Wire {
     static final int EVENT = 2;
     static final int UNLOAD = 3;
     static final int BACK = 4;
-    private static final int BATCH = 0xB1;
-    private static final int NULL_STR = 0xFFFF;
+    private static final int BATCH = 0xB2;
+    private static final int NULL_STR = -1;
+    static final int MAX_MESSAGE = 4 * 1024 * 1024;
+    /** Ops per frame: the count is a u8, so this is the protocol's ceiling, not a tuning knob. */
+    static final int MAX_BATCH = 255;
 
     private Wire() {
     }
@@ -43,7 +47,7 @@ final class Wire {
     }
 
     static Inbound decode(byte[] frame) {
-        if (frame.length < 5) {
+        if (frame.length < 7 || frame.length > MAX_MESSAGE) {
             throw new IllegalArgumentException("short frame");
         }
         int type = frame[0] & 0xFF;
@@ -51,24 +55,26 @@ final class Wire {
         int o = 2;
         int elLen = frame[o] & 0xFF;
         o += 1;
-        if (o + elLen + 2 > frame.length) {
+        if (o + elLen + 4 > frame.length) {
             throw new IllegalArgumentException("element overflow");
         }
         String el = new String(frame, o, elLen, StandardCharsets.UTF_8);
         o += elLen;
-        int plen = (frame[o] & 0xFF) | ((frame[o + 1] & 0xFF) << 8);
-        o += 2;
-        if (o + plen != frame.length) {
+        long plen = Integer.toUnsignedLong((frame[o] & 0xFF) | ((frame[o + 1] & 0xFF) << 8)
+                | ((frame[o + 2] & 0xFF) << 16) | ((frame[o + 3] & 0xFF) << 24));
+        o += 4;
+        if (plen != frame.length - o) {
             throw new IllegalArgumentException("payload overflow");
         }
         Map<String, Object> payload = plen == 0 ? new java.util.LinkedHashMap<>()
-                : Json.obj(Json.parse(new String(frame, o, plen, StandardCharsets.UTF_8)));
+                : Json.obj(Json.parse(new String(frame, o, (int) plen, StandardCharsets.UTF_8)));
         return new Inbound(type, evCode, el, payload);
     }
 
     static byte[] encode(List<Ops.Op> ops) {
-        if (ops.size() > 255) {
-            throw new IllegalArgumentException("op batch too large: " + ops.size() + " (max 255)");
+        if (ops.size() > MAX_BATCH) {
+            throw new IllegalArgumentException("op batch too large: " + ops.size()
+                    + " (max " + MAX_BATCH + ")");
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream(64 + ops.size() * 16);
         out.write(BATCH);
@@ -86,8 +92,7 @@ final class Wire {
             case Ops.Set s -> {
                 writeString(out, s.path());
                 if (s.value() == null) {
-                    out.write(NULL_STR);
-                    out.write(NULL_STR >>> 8);
+                    writeInt(out, NULL_STR);
                 } else {
                     writeString(out, s.value());
                 }
@@ -127,10 +132,10 @@ final class Wire {
     private static void writeSubtree(ByteArrayOutputStream out, String html,
             Map<String, List<Ops.EvSub>> subs) {
         writeString(out, html);
-        if (subs.size() > 255 || subs.values().stream().anyMatch(events -> events.size() > 255)) {
+        if (subs.values().stream().anyMatch(events -> events.size() > 255)) {
             throw new IllegalArgumentException("too many event subscriptions");
         }
-        out.write(subs.size());
+        writeInt(out, subs.size());
         for (Map.Entry<String, List<Ops.EvSub>> e : subs.entrySet()) {
             writeShort(out, e.getKey());
             out.write(e.getValue().size());
@@ -152,11 +157,17 @@ final class Wire {
 
     private static void writeString(ByteArrayOutputStream out, String s) {
         byte[] b = s.getBytes(StandardCharsets.UTF_8);
-        if (b.length >= NULL_STR) {
+        if (b.length > MAX_MESSAGE) {
             throw new IllegalArgumentException("wire string too long: " + b.length);
         }
-        out.write(b.length);
-        out.write(b.length >>> 8);
+        writeInt(out, b.length);
         out.write(b, 0, b.length);
+    }
+
+    private static void writeInt(ByteArrayOutputStream out, int value) {
+        out.write(value);
+        out.write(value >>> 8);
+        out.write(value >>> 16);
+        out.write(value >>> 24);
     }
 }

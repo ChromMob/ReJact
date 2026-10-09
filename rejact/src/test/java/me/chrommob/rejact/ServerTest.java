@@ -63,10 +63,10 @@ class ServerTest {
             ByteArrayOutputStream event = new ByteArrayOutputStream();
             event.write(new byte[]{2, (byte)EventCodes.code("click"), (byte)uid.length});
             event.write(uid);
-            event.write(new byte[]{2, 0, '{', '}'});
+            event.write(new byte[]{2, 0, 0, 0, '{', '}'});
             masked(socket.getOutputStream(), 0x82, event.toByteArray());
             byte[] response = readServerFrame(socket.getInputStream());
-            assertEquals(0xb1, response[0] & 255);
+            assertEquals(0xb2, response[0] & 255);
             assertTrue(new String(response, StandardCharsets.UTF_8).contains("clicked 1"));
             readServerFrame(socket.getInputStream()); // readFile command establishes pending upload
             String url = "/_rejact/upload?view=tab&el=" + file.uid();
@@ -83,8 +83,8 @@ class ServerTest {
         try (Socket socket = connect()) {
             socket.getOutputStream().write(upgrade("fragment", cookie, origin(), "").getBytes(StandardCharsets.US_ASCII));
             assertTrue(headers(socket.getInputStream()).startsWith("HTTP/1.1 101"));
-            masked(socket.getOutputStream(), 0x02, new byte[128 * 1024]);
-            masked(socket.getOutputStream(), 0x80, new byte[129 * 1024]);
+            masked(socket.getOutputStream(), 0x02, new byte[Wire.MAX_MESSAGE / 2]);
+            masked(socket.getOutputStream(), 0x80, new byte[Wire.MAX_MESSAGE / 2 + 1]);
             assertEquals(-1, socket.getInputStream().read());
         }
     }

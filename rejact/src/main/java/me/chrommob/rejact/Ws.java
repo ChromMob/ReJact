@@ -20,7 +20,7 @@ final class Ws {
     static final int OP_CLOSE = 0x8;
     static final int OP_PING = 0x9;
     static final int OP_PONG = 0xA;
-    static final int MAX_FRAME = 256 * 1024;
+    static final int MAX_FRAME = Wire.MAX_MESSAGE;
 
     /** Wire accounting for /_rejact/stats: application payload bytes and message counts. */
     static final AtomicLong BYTES_IN = new AtomicLong();

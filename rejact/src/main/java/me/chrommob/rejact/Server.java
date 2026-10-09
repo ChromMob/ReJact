@@ -31,7 +31,7 @@ import me.chrommob.rejact.gen.EventCodes;
  */
 public final class Server implements AutoCloseable {
     private static final int MAX_HEADERS = 32 * 1024;
-    private static final int MAX_EVENT_BODY = 256 * 1024;
+    private static final int MAX_EVENT_BODY = Wire.MAX_MESSAGE;
     private static final int MAX_UPLOAD_BODY = 24 * 1024 * 1024;
     private static final SecureRandom RANDOM = new SecureRandom();
 

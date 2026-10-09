@@ -30,10 +30,14 @@ class ProtocolTest {
         for (byte[] frame : List.of(new byte[]{1,0,0,0}, new byte[]{1,0,100,0,0}, new byte[]{1,0,0,0,0,1})) {
             assertThrows(IllegalArgumentException.class, () -> Wire.decode(frame));
         }
-        assertEquals(Wire.LOAD, Wire.decode(new byte[]{1,0,0,0,0}).type());
+        assertEquals(Wire.LOAD, Wire.decode(new byte[]{1,0,0,0,0,0,0}).type());
+        assertThrows(IllegalArgumentException.class, () -> Wire.decode(new byte[]{1,0,0,-1,-1,-1,-1}));
     }
-    @Test void reservedStringLengthCannotEncodeAsNull() {
-        assertThrows(IllegalArgumentException.class, () -> Wire.encode(List.of(Ops.text("x", "a".repeat(65535)))));
+    @Test void largeStringsEncodeAndOversizedStringsAreRejected() {
+        byte[] encoded = Wire.encode(List.of(Ops.text("x", "界".repeat(200000))));
+        assertEquals(0xb2, encoded[0] & 255);
+        assertTrue(encoded.length > 600000);
+        assertThrows(IllegalArgumentException.class, () -> Wire.encode(List.of(Ops.text("x", "a".repeat(Wire.MAX_MESSAGE + 1)))));
     }
     @Test void jsonRejectsTrailingInputAndExcessiveNesting() {
         for (String text : List.of("{} trailing", "", "[", "{", "\"a\nb\"", "01", "[".repeat(2000))) {

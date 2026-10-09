@@ -15,13 +15,13 @@ function evcode(name) { return RJ_N.indexOf(name) + 1; }
 function frame(type, ev, uid, payload) {
   var p = enc.encode(JSON.stringify(payload || {}));
   var u = enc.encode(uid || '');
-  if (u.length > 255 || p.length > 65535) throw new RangeError('ReJact event exceeds wire limits');
-  var buf = new Uint8Array(5 + u.length + p.length);
+  if (u.length > 255 || 7 + u.length + p.length > 4 * 1024 * 1024) throw new RangeError('ReJact event exceeds wire limits');
+  var buf = new Uint8Array(7 + u.length + p.length);
   var dv = new DataView(buf.buffer);
   buf[0] = type; buf[1] = ev; buf[2] = u.length;
   buf.set(u, 3);
-  dv.setUint16(3 + u.length, p.length, true);
-  buf.set(p, 5 + u.length);
+  dv.setUint32(3 + u.length, p.length, true);
+  buf.set(p, 7 + u.length);
   return buf.buffer;
 }
 function post(buf) { if (ws && ws.readyState === 1) ws.send(buf); }
@@ -112,14 +112,15 @@ function regNew(parent, prev, subs) {
 reg(document, cfg.subs || {});
 
 function dstr(o, w) {
-  var n = w ? dv.getUint16(o, true) : dv.getUint8(o); o += w ? 2 : 1;
-  if (w && n === 0xffff) return [null, o];
+  var n = w ? dv.getUint32(o, true) : dv.getUint8(o); o += w ? 4 : 1;
+  if (w && n === 0xffffffff) return [null, o];
+  if (n > u8.length - o) throw new RangeError('ReJact truncated wire string');
   return [dec.decode(u8.subarray(o, o + n)), o + n];
 }
 function rstr(o) { return dstr(o, 0); }
 function sstr(o) { return dstr(o, 1); }
 function submap(o) {
-  var n = dv.getUint8(o); o += 1; var out = {};
+  var n = dv.getUint32(o, true); o += 4; var out = {};
   for (var i = 0; i < n; i++) {
     var r = rstr(o); o = r[1];
     var m = dv.getUint8(o); o += 1;
@@ -239,7 +240,7 @@ function connect() {
   ws.onmessage = function (m) {
     if (typeof m.data === 'string') return;
     dv = new DataView(m.data); u8 = new Uint8Array(m.data);
-    if (u8[0] !== 0xb1) return;
+    if (u8[0] !== 0xb2) { ws.close(); return; }
     var count = u8[1], o = 2;
     for (var i = 0; i < count; i++) o = apply(o);
   };
