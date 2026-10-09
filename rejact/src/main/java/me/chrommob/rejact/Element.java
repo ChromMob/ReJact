@@ -282,8 +282,26 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
         }
     }
 
+    /**
+     * Folds a class attribute set by {@code cssClass} into the live class list, so that the two
+     * ways of naming classes share one source of truth and {@link #removeClass} can remove a
+     * class however it was added.
+     */
+    private void adoptClassAttribute() {
+        String attribute = attrs.remove("class");
+        if (attribute == null) {
+            return;
+        }
+        for (String name : attribute.trim().split("\\s+")) {
+            if (!name.isEmpty() && !classNames.contains(name)) {
+                classNames.add(name);
+            }
+        }
+    }
+
     public S addClass(String name) {
         synchronized (lock()) {
+            adoptClassAttribute();
             if (!classNames.contains(name)) {
                 classNames.add(name);
             }
@@ -298,6 +316,7 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
 
     public S removeClass(String name) {
         synchronized (lock()) {
+            adoptClassAttribute();
             if (classNames.remove(name) && page != null) {
                 for (Ops.Op op : Ops.classes(uid, List.of(), List.of(name))) {
                     page.broadcast(op);
@@ -407,11 +426,20 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
 
     void render(StringBuilder sb) {
         sb.append('<').append(tag).append(" data-rj=\"").append(uid).append('"');
+        // Classes can arrive two ways - cssClass("a b") writes the attribute, addClass("c")
+        // appends to the list - and an element very often uses both. Emitting them as two class
+        // attributes produces markup where the browser silently keeps the first and drops the
+        // second, so a server-rendered element would come back missing exactly the state that
+        // addClass was expressing. Merge them into one attribute instead.
+        String merged = mergedClasses();
         for (Map.Entry<String, String> e : attrs.entrySet()) {
+            if ("class".equals(e.getKey())) {
+                continue;
+            }
             sb.append(' ').append(e.getKey()).append("=\"").append(Esc.html(e.getValue())).append('"');
         }
-        if (!classNames.isEmpty()) {
-            sb.append(" class=\"").append(Esc.html(String.join(" ", classNames))).append('"');
+        if (!merged.isEmpty()) {
+            sb.append(" class=\"").append(Esc.html(merged)).append('"');
         }
         if (!styleProps.isEmpty()) {
             sb.append(" style=\"");
@@ -447,6 +475,21 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
             kid.render(sb);
         }
         return sb.toString();
+    }
+
+    /** The class attribute and the addClass list as one deduplicated, order-preserving list. */
+    private String mergedClasses() {
+        java.util.LinkedHashSet<String> all = new java.util.LinkedHashSet<>();
+        String attribute = attrs.get("class");
+        if (attribute != null) {
+            for (String name : attribute.trim().split("\\s+")) {
+                if (!name.isEmpty()) {
+                    all.add(name);
+                }
+            }
+        }
+        all.addAll(classNames);
+        return String.join(" ", all);
     }
 
     Map<String, List<Ops.EvSub>> collectSubs() {
