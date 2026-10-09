@@ -398,9 +398,9 @@ public final class Server implements AutoCloseable {
                 byte[] data = body == null ? new byte[0] : body;
                 long size = data.length;
                 long lastModified = meta.get("lastModified") instanceof Number n ? n.longValue() : 0L;
-                handler.handle(new Ui(view, view.cookies),
+                view.page.batched(() -> handler.handle(new Ui(view, view.cookies),
                         new Ui.FileMeta(Json.str(meta, "name"), Json.str(meta, "type"), size,
-                                lastModified), data);
+                                lastModified), data));
             }
         }
         sendResponse(out, 204, null, null, new byte[0]);
@@ -492,37 +492,43 @@ public final class Server implements AutoCloseable {
             synchronized (view.page) {
                 Ui ui = new Ui(view, view.cookies);
                 ui.captureViewport(msg.payload());
-                switch (msg.type()) {
-                    case Wire.LOAD -> {
-                        for (Map.Entry<String, Object> e : Json.obj(msg.payload().get("v")).entrySet()) {
-                            if (view.page.containsElement(e.getKey())) {
-                                view.values.put(e.getKey(), String.valueOf(e.getValue()));
-                            }
-                        }
-                        if (msg.payload().get("r") instanceof Number r && r.intValue() != 0) {
-                            // Reconnect from the authoritative tree; oversized snapshots fail visibly.
-                            view.send(view.page.snapshot());
-                        }
-                        view.page.fireLoad(ui);
-                        ui.enterFromUrl();
-                    }
-                    case Wire.BACK -> ui.enterFromUrl();
-                    case Wire.EVENT -> {
-                        Object value = msg.payload().get("value");
-                        if (value instanceof String s && view.page.containsElement(msg.el())) {
-                            view.values.put(msg.el(), s);
-                        }
-                        view.page.dispatch(msg.el(), EventCodes.name(msg.evCode()), ui, msg.payload());
-                    }
-                    case Wire.UNLOAD -> view.page.fireUnload(ui);
-                    default -> {
-                        // unknown message type: ignore
-                    }
-                }
+                // One inbound event, one outbound frame: the handler may touch a hundred
+                // elements, but the browser applies the gesture in a single pass.
+                view.page.batched(() -> dispatchFrame(view, ui, msg));
             }
         } catch (Exception e) {
             System.getLogger(Server.class.getName()).log(System.Logger.Level.WARNING, "event rejected", e);
             view.close();
+        }
+    }
+
+    private void dispatchFrame(View view, Ui ui, Wire.Inbound msg) {
+        switch (msg.type()) {
+            case Wire.LOAD -> {
+                for (Map.Entry<String, Object> e : Json.obj(msg.payload().get("v")).entrySet()) {
+                    if (view.page.containsElement(e.getKey())) {
+                        view.values.put(e.getKey(), String.valueOf(e.getValue()));
+                    }
+                }
+                if (msg.payload().get("r") instanceof Number r && r.intValue() != 0) {
+                    // Reconnect from the authoritative tree; oversized snapshots fail visibly.
+                    view.send(view.page.snapshot());
+                }
+                view.page.fireLoad(ui);
+                ui.enterFromUrl();
+            }
+            case Wire.BACK -> ui.enterFromUrl();
+            case Wire.EVENT -> {
+                Object value = msg.payload().get("value");
+                if (value instanceof String s && view.page.containsElement(msg.el())) {
+                    view.values.put(msg.el(), s);
+                }
+                view.page.dispatch(msg.el(), EventCodes.name(msg.evCode()), ui, msg.payload());
+            }
+            case Wire.UNLOAD -> view.page.fireUnload(ui);
+            default -> {
+                // unknown message type: ignore
+            }
         }
     }
 

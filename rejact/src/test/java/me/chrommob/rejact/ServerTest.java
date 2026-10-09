@@ -65,10 +65,12 @@ class ServerTest {
             event.write(uid);
             event.write(new byte[]{2, 0, 0, 0, '{', '}'});
             masked(socket.getOutputStream(), 0x82, event.toByteArray());
+            // One gesture, one frame: the handler's text write and its readFile command are
+            // batched together rather than costing the browser two separate DOM passes.
             byte[] response = readServerFrame(socket.getInputStream());
             assertEquals(0xb2, response[0] & 255);
+            assertEquals(2, response[1] & 255, "the click's two ops must share one frame");
             assertTrue(new String(response, StandardCharsets.UTF_8).contains("clicked 1"));
-            readServerFrame(socket.getInputStream()); // readFile command establishes pending upload
             String url = "/_rejact/upload?view=tab&el=" + file.uid();
             String other = cookie(request("GET / HTTP/1.1\r\n"));
             assertTrue(upload(url, other).startsWith("HTTP/1.1 403"));

@@ -112,13 +112,17 @@ public final class Page {
     private void schedule(Timer timer) {
         scheduled.add(TIMERS.scheduleAtFixedRate(() -> {
             synchronized (this) {
-                for (View view : views.values()) {
-                    try {
-                        timer.action().accept(new Ui(view, view.cookies));
-                    } catch (Exception e) {
-                        System.getLogger(Page.class.getName()).log(System.Logger.Level.WARNING, "timer failed", e);
+                // A tick that touches twenty elements is still one repaint, not twenty.
+                batched(() -> {
+                    for (View view : views.values()) {
+                        try {
+                            timer.action().accept(new Ui(view, view.cookies));
+                        } catch (Exception e) {
+                            System.getLogger(Page.class.getName())
+                                    .log(System.Logger.Level.WARNING, "timer failed", e);
+                        }
                     }
-                }
+                });
             }
         }, timer.millis(), timer.millis(), TimeUnit.MILLISECONDS));
     }
@@ -241,6 +245,38 @@ public final class Page {
     void broadcast(Ops.Op op) {
         for (View view : views.values()) {
             view.send(op);
+        }
+    }
+
+    /**
+     * Runs {@code body} with every connected view batching its ops, so one logical change reaches
+     * each browser as a single frame and a single DOM update. Views that connect while the batch
+     * is open are not retro-enrolled: they are mid-handshake and get the authoritative tree anyway.
+     *
+     * <p>The framework already wraps inbound events, uploads and timer ticks in a batch. Call this
+     * directly for updates that originate server-side - a background job, or a change pushed in
+     * from another user's connection - which otherwise reach the browser one mutation at a time.
+     *
+     * <p>Nestable, and safe to call from any thread. The batch is opened and closed on the page
+     * monitor, the same lock element mutations take, so a concurrent gesture on another connection
+     * cannot interleave into this one's frame.
+     */
+    public void batch(Runnable body) {
+        batched(body);
+    }
+
+    void batched(Runnable body) {
+        List<View> enrolled;
+        synchronized (this) {
+            enrolled = new ArrayList<>(views.values());
+            enrolled.forEach(View::openBatch);
+        }
+        try {
+            body.run();
+        } finally {
+            synchronized (this) {
+                enrolled.forEach(View::closeBatch);
+            }
         }
     }
 
