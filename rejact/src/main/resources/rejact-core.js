@@ -45,7 +45,6 @@ function ev(p) {
     : o === 9 ? Math.max(ev(p[1]), ev(p[2])) : V[p[1]] ? Date.now() - V[p[1]][1] : 0;
 }
 function vp(p) { p.sy = window.scrollY | 0; p.w = window.innerWidth; return p; }
-
 function chord(e) {
   var s = '';
   if (e.ctrlKey) s += 'ctrl+';
@@ -73,6 +72,12 @@ function attach(uid, el, def) {
   var prevent = (def && def.p) || [];
   events.forEach(function (ev) {
     el.addEventListener(ev, function (e) {
+      if (ev === 'pointerdown' && el.hasAttribute('data-rj-pointer-capture')) {
+        var owner = e.target && e.target.closest ? e.target.closest('[data-rj-pointer-capture]') : el;
+        if (owner === el) {
+          try { el.setPointerCapture(e.pointerId); } catch (err) {}
+        }
+      }
       if (prevent.indexOf(ev) >= 0) e.preventDefault();
       // Key chords the app has claimed via data-rj-keys. Browsers own several useful
       // combinations (ctrl+k opens the omnibox search), and an app that wants one has to say
@@ -94,6 +99,11 @@ function attach(uid, el, def) {
           }
         }
       } catch (err) {}
+      if (ev === 'pointerdown' || ev === 'pointermove' || ev === 'pointerup') {
+        var rect = el.getBoundingClientRect();
+        payload.localX = e.clientX - rect.left;
+        payload.localY = e.clientY - rect.top;
+      }
       post(frame(2, evcode(ev), uid, vp(payload)));
     });
   });
