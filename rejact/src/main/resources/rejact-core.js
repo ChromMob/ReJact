@@ -46,6 +46,15 @@ function ev(p) {
 }
 function vp(p) { p.sy = window.scrollY | 0; p.w = window.innerWidth; return p; }
 
+function chord(e) {
+  var s = '';
+  if (e.ctrlKey) s += 'ctrl+';
+  if (e.metaKey) s += 'meta+';
+  if (e.altKey) s += 'alt+';
+  if (e.shiftKey) s += 'shift+';
+  return s + String(e.key || '').toLowerCase();
+}
+
 // ---- registration: every node is wired once and released with its element ----
 function drop(d) {
   var u = d.getAttribute('data-rj');
@@ -65,6 +74,13 @@ function attach(uid, el, def) {
   events.forEach(function (ev) {
     el.addEventListener(ev, function (e) {
       if (prevent.indexOf(ev) >= 0) e.preventDefault();
+      // Key chords the app has claimed via data-rj-keys. Browsers own several useful
+      // combinations (ctrl+k opens the omnibox search), and an app that wants one has to say
+      // so per chord: blanket-preventing keydown would stop the user typing at all.
+      if (ev === 'keydown') {
+        var claimed = el.getAttribute('data-rj-keys');
+        if (claimed && claimed.split(',').indexOf(chord(e)) >= 0) e.preventDefault();
+      }
       var payload = {};
       try {
         var s = RJ_PULL[ev];

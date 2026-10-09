@@ -272,6 +272,18 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
         }
     }
 
+    /**
+     * Claims keyboard chords so the browser does not act on them first.
+     *
+     * <p>Chords look like {@code "ctrl+k"} or {@code "meta+shift+p"}: modifiers in the order
+     * ctrl, meta, alt, shift, then the key name lowercased. Only a listed chord has its default
+     * suppressed, which is the whole point — a page that prevented the default for every keydown
+     * would stop the user typing.
+     */
+    public S claimKeys(String... chords) {
+        return attr("data-rj-keys", String.join(",", chords).toLowerCase(java.util.Locale.ROOT));
+    }
+
     public S style(String prop, String value) {
         synchronized (lock()) {
             styleProps.put(prop, value);
