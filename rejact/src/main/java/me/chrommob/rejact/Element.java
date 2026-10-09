@@ -261,7 +261,7 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
                 attrs.put(name, value);
             }
             if (page != null) {
-                if ("value".equals(name) && ("input".equals(tag) || "textarea".equals(tag))) {
+                if ("value".equals(name) && ("input".equals(tag) || "textarea".equals(tag) || "select".equals(tag))) {
                     page.broadcast(Ops.value(uid, value == null ? "" : value));
                     page.updateValue(uid, value == null ? "" : value);
                 } else {
@@ -325,6 +325,33 @@ public abstract class Element<S extends Element<S>> implements Eventful<S>, Glob
             return self();
         }
     }
+
+    /**
+     * Records what the user typed into this field, in the tree only.
+     *
+     * <p>The browser already shows the value, so nothing is sent: broadcasting it back would
+     * overwrite keystrokes still in flight. What it fixes is the other direction. The tree is what
+     * a reload renders and what a reconnect replaces the page with, so a field whose typed value
+     * never reached the tree came back as it was first built, and the next keystroke saved that
+     * stale text plus one character over the real document.
+     *
+     * <p>Fields that do not hold text the user would expect back are left alone: a password must
+     * not be written into markup, and a checkbox's value is a label, not what was entered.
+     */
+    void adoptTypedValue(String value) {
+        synchronized (lock()) {
+            if ("textarea".equals(tag)) {
+                children.clear();
+                children.add(new TextNode(value));
+                attrs.put("value", value);
+            } else if ("input".equals(tag) && !NOT_TYPED.contains(attrs.getOrDefault("type", "text"))) {
+                attrs.put("value", value);
+            }
+        }
+    }
+
+    private static final java.util.Set<String> NOT_TYPED = java.util.Set.of(
+            "password", "checkbox", "radio", "file", "button", "submit", "reset", "image", "hidden");
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     void dispatch(String event, Ui ui, Map<String, Object> payload) {

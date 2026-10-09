@@ -223,6 +223,14 @@ public final class Page {
         registry.put(element.uid(), element);
     }
 
+    /** Mirrors a value typed in the browser into the tree, so a reload or reconnect brings it back. */
+    void adoptTypedValue(String uid, String value) {
+        Element<?> element = registry.get(uid);
+        if (element != null) {
+            element.adoptTypedValue(value);
+        }
+    }
+
     boolean containsElement(String uid) {
         return registry.containsKey(uid);
     }

@@ -522,6 +522,10 @@ public final class Server implements AutoCloseable {
                 Object value = msg.payload().get("value");
                 if (value instanceof String s && view.page.containsElement(msg.el())) {
                     view.values.put(msg.el(), s);
+                    String name = EventCodes.name(msg.evCode());
+                    if ("input".equals(name) || "change".equals(name)) {
+                        view.page.adoptTypedValue(msg.el(), s);
+                    }
                 }
                 view.page.dispatch(msg.el(), EventCodes.name(msg.evCode()), ui, msg.payload());
             }
